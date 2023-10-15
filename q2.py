@@ -33,6 +33,47 @@ class NetworkFlow:
     def __str__(self):
         return "\n".join(str(edge) for edge in self.edges)
 
+    def make_network(self, preferences, licenses):
+        # Create source vertices
+        source1 = Vertex("source 1")
+        source2 = Vertex("source 2")
+        self.add_vertex(source1)
+        self.add_vertex(source2)
+
+        # Connect source 1 to source 2
+        self.add_edge(Edge(source1, source2, len(preferences)))
+
+        # Create p vertices and connect source 2 to p vertices
+        p_vertices = [Vertex(f"p{i}") for i in range(len(preferences))]
+        for p_vertex in p_vertices:
+            self.add_vertex(p_vertex)
+            self.add_edge(Edge(source2, p_vertex, 1))
+
+        # Create d vertices and connect to sink
+        num_d = math.ceil(len(preferences) / 5)
+        d_vertices = [Vertex(f"d{i}") for i in range(num_d)]
+        sink = Vertex("sink")
+        self.add_vertex(sink)
+        for d_vertex in d_vertices:
+            self.add_vertex(d_vertex)
+            self.add_edge(Edge(d_vertex, sink, 2))
+
+        # Connect p vertices with license to d vertices
+        for i, prefs in enumerate(preferences):
+            if i in licenses:
+                for pref in prefs:
+                    self.add_edge(Edge(p_vertices[i], d_vertices[pref], 1))
+
+        # Create c vertices and connect p vertices to c vertices and c vertices to sink
+        num_c = math.ceil(len(preferences) / 5)
+        c_vertices = [Vertex(f"c{i}") for i in range(num_c)]
+        for c_vertex in c_vertices:
+            self.add_vertex(c_vertex)
+            self.add_edge(Edge(c_vertex, sink, 3))
+        for i, prefs in enumerate(preferences):
+            for pref in prefs:
+                self.add_edge(Edge(p_vertices[i], c_vertices[pref], 1))
+
 class ResidualNetwork(NetworkFlow):
     def __init__(self, network):
         super().__init__()
