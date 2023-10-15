@@ -141,15 +141,16 @@ class ResidualNetwork(NetworkFlow):
         return connected_vertices
 
 if __name__ == '__main__':
-    preferences = [[0], [0, 1], [0], [1, 0], [1], [1]]
-    licences = [4, 2, 0, 5]
+    preferences = [[1], [0], [0, 1], [1, 0], [0, 1], [1, 0], [1], [1], [0], [0, 1]]
+    licences = [6, 3, 4, 9, 1]
     # Create vertices
     source1 = Vertex('source1')
     source2 = Vertex('source2')
     sink = Vertex('sink')
-    p_vertices = [Vertex(f'p{i}') for i in range(6)]
-    d_vertices = [Vertex(f'd{i}') for i in range(2)]
-    c_vertices = [Vertex(f'c{i}') for i in range(2)]
+    len_pref=len(preferences)
+    p_vertices = [Vertex(f'p{i}') for i in range(len_pref)]
+    d_vertices = [Vertex(f'd{i}') for i in range(math.ceil(len_pref/5))]
+    c_vertices = [Vertex(f'c{i}') for i in range(math.ceil(len_pref/5))]
 
     # Create network flow
     my_graph = NetworkFlow()
@@ -157,7 +158,7 @@ if __name__ == '__main__':
         my_graph.add_vertex(vertex)
 
     # Add edge from source1 to source2
-    my_graph.add_edge(Edge(source1, source2, 6))
+    my_graph.add_edge(Edge(source1, source2, len_pref))
 
     # Add edges from source2 to p_vertices
     for p_vertex in p_vertices:
@@ -165,10 +166,11 @@ if __name__ == '__main__':
 
     # Add edges from p_vertices to d_vertices
     edges_from_p_to_d = {
-        'p4': ['d1'],
-        'p2': ['d0', 'd1'],
-        'p0': ['d0'],
-        'p5': ['d1'],
+        'p6': ['d1'],
+        'p3': ['d0', 'd1'],
+        'p4': ['d0','d1'],
+        'p9': ['d0','d1'],
+        'p1': ['d0'],
     }
     for p_name, d_names in edges_from_p_to_d.items():
         p_vertex = next(vertex for vertex in p_vertices if vertex.name == p_name)
@@ -181,11 +183,11 @@ if __name__ == '__main__':
         my_graph.add_edge(Edge(d_vertex, sink, 2))
 
     # Add edges from p_vertices to c0
-    for p_vertex in [p_vertices[i] for i in [0,1,2,3]]:
+    for p_vertex in [p_vertices[i] for i in [1,2,3,4,5,8,9]]:
         my_graph.add_edge(Edge(p_vertex, c_vertices[0], 1))
 
     # Add edges from p_vertices to c1
-    for p_vertex in [p_vertices[i] for i in [1,3,4,5]]:
+    for p_vertex in [p_vertices[i] for i in [0,2,3,4,5,6,7,9]]:
         my_graph.add_edge(Edge(p_vertex, c_vertices[1], 1))
 
     # Add edges from c_vertices to sink
