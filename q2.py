@@ -97,13 +97,13 @@ if __name__ == '__main__':
 
     # Create network flow
     my_graph = NetworkFlow()
-    for vertex in [source1,source2] + p_vertices + d_vertices + c_vertices + [sink]:
+    for vertex in [source1, source2] + p_vertices + d_vertices + c_vertices + [sink]:
         my_graph.add_vertex(vertex)
 
-    # add edge from source 1 to source2
-    my_graph.add_edge(Edge(source1,source2,9))
+    # Add edge from source1 to source2
+    my_graph.add_edge(Edge(source1, source2, 9))
 
-    # Add edges from source to p_vertices
+    # Add edges from source2 to p_vertices
     for p_vertex in p_vertices:
         my_graph.add_edge(Edge(source2, p_vertex, 1))
 
@@ -116,18 +116,22 @@ if __name__ == '__main__':
     for d_vertex in d_vertices:
         my_graph.add_edge(Edge(d_vertex, sink, 2))
 
-    # Add edges from p_vertices to c_vertices
-    for p_vertex in [p_vertices[i] for i in [0, 2, 3, 6, 7]]:
+    # Add edges from p_vertices to c0
+    for p_vertex in [p_vertices[i] for i in [0, 2, 3, 4, 6, 7]]:
         my_graph.add_edge(Edge(p_vertex, c_vertices[0], 1))
-    for p_vertex in [p_vertices[i] for i in [1, 4, 5, 8]]:
+
+    # Add edges from p_vertices to c1
+    for p_vertex in p_vertices:
         my_graph.add_edge(Edge(p_vertex, c_vertices[1], 1))
 
     # Add edges from c_vertices to sink
     for c_vertex in c_vertices:
         my_graph.add_edge(Edge(c_vertex, sink, 3))
 
-    print('my graph is:')
-    print(my_graph)
-    ford_fulkerson(my_graph)
+    # Run Ford-Fulkerson algorithm
+    max_flow = ford_fulkerson(my_graph)
+    print(f'The maximum flow of the network is {max_flow}.')
 
+#c0=[d0=1,d0=0,2,3,6]
+#c1=[d1=4,d1=5,7,8]
 
