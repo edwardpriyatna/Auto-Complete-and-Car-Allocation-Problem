@@ -86,10 +86,9 @@ def ford_fulkerson(my_graph):
     print(residual_network)
     # Get connected vertices
     connected_vertices = get_connected_vertices(residual_network)
-    flattened_output = [item for sublist in connected_vertices for item in sublist]
-    print(f'The connected vertices are {flattened_output}.')
+    output_list = [sum(sublist, []) for sublist in connected_vertices]
+    print(f'The connected vertices are {output_list}.')
     return flow
-
 
 def get_connected_vertices(network):
     connected_vertices = []
