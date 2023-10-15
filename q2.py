@@ -108,8 +108,17 @@ if __name__ == '__main__':
         my_graph.add_edge(Edge(source2, p_vertex, 1))
 
     # Add edges from p_vertices to d_vertices
-    for p_vertex in [p_vertices[i] for i in [1, 4, 0, 5, 8]]:
-        for d_vertex in d_vertices:
+    edges_from_p_to_d = {
+        'p1': ['d1'],
+        'p4': ['d0', 'd1'],
+        'p0': ['d0'],
+        'p5': ['d1'],
+        'p8': ['d1']
+    }
+    for p_name, d_names in edges_from_p_to_d.items():
+        p_vertex = next(vertex for vertex in p_vertices if vertex.name == p_name)
+        for d_name in d_names:
+            d_vertex = next(vertex for vertex in d_vertices if vertex.name == d_name)
             my_graph.add_edge(Edge(p_vertex, d_vertex, 1))
 
     # Add edges from d_vertices to sink
@@ -132,6 +141,6 @@ if __name__ == '__main__':
     max_flow = ford_fulkerson(my_graph)
     print(f'The maximum flow of the network is {max_flow}.')
 
-#c0=[d0=1,d0=0,2,3,6]
-#c1=[d1=4,d1=5,7,8]
+#c0=[d0=4,d0=0,2,3,6]
+#c1=[d1=1,d1=5,7,8]
 
