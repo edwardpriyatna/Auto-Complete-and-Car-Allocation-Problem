@@ -110,38 +110,28 @@ class ResidualNetwork(NetworkFlow):
         for edge in path:
             edge.flow += min_residual_capacity
 
-def ford_fulkerson(my_graph):
-    flow=0
-    print('residual is:')
-    residual_network=ResidualNetwork(my_graph)
-    print(residual_network)
-    while residual_network.has_AugmentingPath(residual_network.vertices[0], residual_network.vertices[-1]):
-        path= residual_network.get_AugmentingPath(residual_network.vertices[0], residual_network.vertices[-1])
-        min_residual_capacity = min(edge.capacity - edge.flow for edge in path)
-        flow += min_residual_capacity
-        residual_network.augment_flow(path)
+    def ford_fulkerson(self):
+        flow = 0
+        while self.has_AugmentingPath(self.vertices[0], self.vertices[-1]):
+            path = self.get_AugmentingPath(self.vertices[0], self.vertices[-1])
+            min_residual_capacity = min(edge.capacity - edge.flow for edge in path)
+            flow += min_residual_capacity
+            self.augment_flow(path)
+        return flow
 
-    # Print the flow of each edge in the residual network
-    print('the graph after ford fulkerson')
-    print(residual_network)
-    # Get connected vertices
-    connected_vertices = get_connected_vertices(residual_network)
-    output_list = [sum(sublist, []) for sublist in connected_vertices]
-    print(f'The connected vertices are {output_list}.')
-    return flow
+    def get_connected_vertices(self):
+        connected_vertices = []
+        d_vertices = [vertex for vertex in self.vertices if vertex.name.startswith('d')]
+        c_vertices = [vertex for vertex in self.vertices if vertex.name.startswith('c')]
 
-def get_connected_vertices(network):
-    connected_vertices = []
-    d_vertices = [vertex for vertex in network.vertices if vertex.name.startswith('d')]
-    c_vertices = [vertex for vertex in network.vertices if vertex.name.startswith('c')]
+        for d_vertex, c_vertex in zip(d_vertices, c_vertices):
+            p_vertices_d = [edge.start_vertex.name for edge in self.edges if
+                            edge.end_vertex == d_vertex and edge.flow > 0]
+            p_vertices_c = [edge.start_vertex.name for edge in self.edges if
+                            edge.end_vertex == c_vertex and edge.flow > 0]
+            connected_vertices.append([p_vertices_d, p_vertices_c])
 
-    for d_vertex, c_vertex in zip(d_vertices, c_vertices):
-        p_vertices_d = [edge.start_vertex.name for edge in network.edges if
-                        edge.end_vertex == d_vertex and edge.flow > 0]
-        p_vertices_c = [edge.start_vertex.name for edge in network.edges if
-                        edge.end_vertex == c_vertex and edge.flow > 0]
-        connected_vertices.append([p_vertices_d, p_vertices_c])
-    return connected_vertices
+        return connected_vertices
 
 if __name__ == '__main__':
     # Create vertices
