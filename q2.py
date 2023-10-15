@@ -141,8 +141,8 @@ class ResidualNetwork(NetworkFlow):
         return connected_vertices
 
 if __name__ == '__main__':
-    preferences = [[0], [0], [0], [0], [0], [1], [1], [1], [1], [1], [2], [2]]
-    licences = [0, 1, 5, 6, 10, 11]
+    preferences = [[0, 2], [1], [1, 0], [0], [0], [1], [0], [2], [2], [2], [2, 1], [1]]
+    licences = [0, 3, 2, 5, 10, 9]
     # Create vertices
     source1 = Vertex('source1')
     source2 = Vertex('source2')
@@ -166,12 +166,12 @@ if __name__ == '__main__':
 
     # Add edges from p_vertices to d_vertices
     edges_from_p_to_d = {
-        'p0': ['d0'],
-        'p1': ['d0'],
+        'p0': ['d0','d2'],
+        'p3': ['d0'],
+        'p2': ['d0','d1'],
         'p5': ['d1'],
-        'p6': ['d1'],
-        'p10':['d2'],
-        'p11': ['d2'],
+        'p10':['d2','d1'],
+        'p9': ['d2']
     }
     for p_name, d_names in edges_from_p_to_d.items():
         p_vertex = next(vertex for vertex in p_vertices if vertex.name == p_name)
@@ -184,15 +184,15 @@ if __name__ == '__main__':
         my_graph.add_edge(Edge(d_vertex, sink, 2))
 
     # Add edges from p_vertices to c0
-    for p_vertex in [p_vertices[i] for i in [0,1,2,3,4]]:
+    for p_vertex in [p_vertices[i] for i in [0,2,3,4,6]]:
         my_graph.add_edge(Edge(p_vertex, c_vertices[0], 1))
 
     # Add edges from p_vertices to c1
-    for p_vertex in [p_vertices[i] for i in [5,6,7,8,9]]:
+    for p_vertex in [p_vertices[i] for i in [1,2,5,10,11]]:
         my_graph.add_edge(Edge(p_vertex, c_vertices[1], 1))
 
-    # Add edges from p_vertices to c1
-    for p_vertex in [p_vertices[i] for i in [10, 11]]:
+    # Add edges from p_vertices to c2
+    for p_vertex in [p_vertices[i] for i in [0, 7,8,9, 10]]:
         my_graph.add_edge(Edge(p_vertex, c_vertices[2], 1))
 
     # Add edges from c_vertices to sink
@@ -202,6 +202,7 @@ if __name__ == '__main__':
     # Run Ford-Fulkerson algorithm
     residual=ResidualNetwork(my_graph)
     residual.ford_fulkerson()
+    print(residual)
     print(residual.get_connected_vertices())
 
 
