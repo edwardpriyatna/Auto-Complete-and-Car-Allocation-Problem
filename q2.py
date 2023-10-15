@@ -155,19 +155,5 @@ if __name__ == '__main__':
     print(residual)
     print(residual.get_connected_vertices())
 
-#c0=[d0=4,d0=0,2,3,6]
-#c1=[d1=1,d1=5,7,8]
-
-#c0=[d0=4,d0=0,2,3,6]
-#c1=[d1=1,d1=5,7,8]
-
-# if __name__ == '__main__':
-#     preferences = [[0], [1], [0, 1], [0, 1], [1, 0], [1], [1, 0], [0, 1], [1]]
-#     licences = [1, 4, 0, 5, 8]
-#     network=NetworkFlow()
-#     network.make_network(preferences,licences)
-#     residual=ResidualNetwork(network)
-#     ford_fulkerson(residual)
-
 
 
