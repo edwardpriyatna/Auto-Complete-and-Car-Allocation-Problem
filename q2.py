@@ -84,7 +84,25 @@ def ford_fulkerson(my_graph):
     # Print the flow of each edge in the residual network
     print('the graph after ford fulkerson')
     print(residual_network)
+    # Get connected vertices
+    connected_vertices = get_connected_vertices(residual_network)
+    flattened_output = [item for sublist in connected_vertices for item in sublist]
+    print(f'The connected vertices are {flattened_output}.')
     return flow
+
+
+def get_connected_vertices(network):
+    connected_vertices = []
+    d_vertices = [vertex for vertex in network.vertices if vertex.name.startswith('d')]
+    c_vertices = [vertex for vertex in network.vertices if vertex.name.startswith('c')]
+
+    for d_vertex, c_vertex in zip(d_vertices, c_vertices):
+        p_vertices_d = [edge.start_vertex.name for edge in network.edges if
+                        edge.end_vertex == d_vertex and edge.flow > 0]
+        p_vertices_c = [edge.start_vertex.name for edge in network.edges if
+                        edge.end_vertex == c_vertex and edge.flow > 0]
+        connected_vertices.append([p_vertices_d, p_vertices_c])
+    return connected_vertices
 
 if __name__ == '__main__':
     # Create vertices
