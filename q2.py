@@ -4,6 +4,7 @@ class Vertex:
     def __init__(self, name):
         self.name = name
         self.visited = False
+        self.parent = None
 
     def __str__(self):
         return self.name
@@ -36,8 +37,8 @@ class ResidualNetwork(NetworkFlow):
     def __init__(self, network):
         super().__init__()
         self.vertices = network.vertices
-        self.edges = [Edge(edge.start_vertex, edge.end_vertex, edge.capacity, edge.flow) for edge in network.edges]
-        self.parent = {vertex: None for vertex in self.vertices}
+        self.edges = [Edge(edge.start_vertex, edge.end_vertex, edge.capacity, edge.flow)
+                      for edge in network.edges]
 
     def has_AugmentingPath(self, source, sink):
         queue = [source]
@@ -48,7 +49,7 @@ class ResidualNetwork(NetworkFlow):
             for edge in self.edges:
                 residual_capacity = edge.capacity - edge.flow
                 if edge.start_vertex == vertex and not edge.end_vertex.visited and residual_capacity > 0:
-                    self.parent[edge.end_vertex] = edge
+                    edge.end_vertex.parent = edge  # Use the parent attribute of Vertex
                     if edge.end_vertex == sink:
                         self._reset_visited()
                         return True
@@ -57,19 +58,19 @@ class ResidualNetwork(NetworkFlow):
         self._reset_visited()
         return False
 
+    def get_AugmentingPath(self, source, sink):
+        path = []
+        while sink != source:
+            print(sink.parent)
+            edge = sink.parent  # Use the parent attribute of Vertex
+            path.insert(0, edge)
+            sink = edge.start_vertex
+        return path
+
     def _reset_visited(self):
         for vertex in self.vertices:
             vertex.visited = False
-
-    def get_AugmentingPath(self, source, sink):
-        # This method should return the augmenting path as a list of edges
-        path = []
-        while sink != source:
-            edge = self.parent[sink]
-            path.append(edge)
-            sink = edge.start_vertex
-        path.reverse()
-        return path
+            #vertex.parent = None
 
     def augment_flow(self, path):
         # This method should update the flow in the residual network based on the augmenting path
