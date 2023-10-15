@@ -34,45 +34,47 @@ class NetworkFlow:
         return "\n".join(str(edge) for edge in self.edges)
 
     def make_network(self, preferences, licenses):
-        # Create source vertices
-        source1 = Vertex("source 1")
-        source2 = Vertex("source 2")
-        self.add_vertex(source1)
-        self.add_vertex(source2)
+        # Create vertices
+        source1 = Vertex('source1')
+        source2 = Vertex('source2')
+        sink = Vertex('sink')
+        p_vertices = [Vertex(f'p{i}') for i in range(len(preferences))]
+        d_vertices = [Vertex(f'd{i}') for i in range(math.ceil(len(preferences) / 5))]
+        c_vertices = [Vertex(f'c{i}') for i in range(math.ceil(len(preferences) / 5))]
 
-        # Connect source 1 to source 2
+        # Add vertices to the network
+        for vertex in [source1, source2] + p_vertices + d_vertices + c_vertices + [sink]:
+            self.add_vertex(vertex)
+
+        # Add edge from source1 to source2
         self.add_edge(Edge(source1, source2, len(preferences)))
 
-        # Create p vertices and connect source 2 to p vertices
-        p_vertices = [Vertex(f"p{i}") for i in range(len(preferences))]
+        # Add edges from source2 to p_vertices
         for p_vertex in p_vertices:
-            self.add_vertex(p_vertex)
             self.add_edge(Edge(source2, p_vertex, 1))
 
-        # Create d vertices and connect to sink
-        num_d = math.ceil(len(preferences) / 5)
-        d_vertices = [Vertex(f"d{i}") for i in range(num_d)]
-        sink = Vertex("sink")
-        self.add_vertex(sink)
-        for d_vertex in d_vertices:
-            self.add_vertex(d_vertex)
-            self.add_edge(Edge(d_vertex, sink, 2))
-
-        # Connect p vertices with license to d vertices
+        # Add edges from licensed p_vertices to d_vertices based on preferences
         for i, prefs in enumerate(preferences):
             if i in licenses:
+                p_vertex = p_vertices[i]
                 for pref in prefs:
-                    self.add_edge(Edge(p_vertices[i], d_vertices[pref], 1))
+                    d_vertex = d_vertices[pref]
+                    self.add_edge(Edge(p_vertex, d_vertex, 1))
 
-        # Create c vertices and connect p vertices to c vertices and c vertices to sink
-        num_c = math.ceil(len(preferences) / 5)
-        c_vertices = [Vertex(f"c{i}") for i in range(num_c)]
-        for c_vertex in c_vertices:
-            self.add_vertex(c_vertex)
-            self.add_edge(Edge(c_vertex, sink, 3))
+        # Add edges from d_vertices to sink
+        for d_vertex in d_vertices:
+            self.add_edge(Edge(d_vertex, sink, 2))
+
+        # Add edges from p_vertices to c_vertices based on preferences
         for i, prefs in enumerate(preferences):
+            p_vertex = p_vertices[i]
             for pref in prefs:
-                self.add_edge(Edge(p_vertices[i], c_vertices[pref], 1))
+                c_vertex = c_vertices[pref]
+                self.add_edge(Edge(p_vertex, c_vertex, 1))
+
+        # Add edges from c_vertices to sink
+        for c_vertex in c_vertices:
+            self.add_edge(Edge(c_vertex, sink, 3))
 
 class ResidualNetwork(NetworkFlow):
     def __init__(self, network):
@@ -191,10 +193,19 @@ if __name__ == '__main__':
 
     # Run Ford-Fulkerson algorithm
     residual=ResidualNetwork(my_graph)
-    max_flow = residual.ford_fulkerson()
-    print(f'The maximum flow of the network is {max_flow}.')
-    print(residual)
+    residual.ford_fulkerson()
     print(residual.get_connected_vertices())
+
+    #create new graph
+    preferences = [[0], [1], [0, 1], [0, 1], [1, 0], [1], [1, 0], [0, 1], [1]]
+    licenses = [1, 4, 0, 5, 8]
+
+    network_flow_instance = NetworkFlow()
+    network_flow_instance.make_network(preferences, licenses)
+    residual2=ResidualNetwork(network_flow_instance)
+    print(residual2)
+    residual2.ford_fulkerson()
+    print(residual2.get_connected_vertices())
 
 
 
