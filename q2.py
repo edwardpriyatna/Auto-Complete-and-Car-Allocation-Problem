@@ -140,6 +140,14 @@ class ResidualNetwork(Network):
                 connected_p_vertices.append(p_vertices)
         return connected_p_vertices
 
+def allocate(preferences,licenses):
+    preferences=[sorted(sublist) for sublist in preferences]
+    network=Network()
+    network.make_network(preferences,licenses)
+    residual=ResidualNetwork(network)
+    residual.ford_fulkerson()
+    return residual.get_connected_p_vertices()
+
 if __name__ == '__main__':
     preferences = [[0], [1], [0, 1], [0, 1], [0, 1], [1], [0,1], [0, 1], [1]]
     licences = [1, 4, 0, 5, 8]
