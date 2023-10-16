@@ -1,3 +1,5 @@
+import math
+
 class Vertex:
     def __init__(self, name):
         self.name = name
@@ -40,9 +42,44 @@ class Network:
                 result += f"  {e}\n"
         return result
 
+    def make_network(self, preferences, licenses):
+        # Create source and sink vertices
+        source = self.add_vertex("source")
+        sink = self.add_vertex("sink")
+
+        # Create p vertices and connect them to source
+        p_vertices = [self.add_vertex(f"p{i}") for i in range(len(preferences))]
+        for p_vertex in p_vertices:
+            self.add_edge(source, p_vertex, 1)
+
+        # Create d vertices
+        num_d_vertices = math.ceil(len(preferences) / 5)
+        d_vertices = [self.add_vertex(f"d{i}") for i in range(num_d_vertices)]
+
+        # Create c vertices
+        num_c_vertices = math.ceil(len(preferences) / 5)
+        c_vertices = [self.add_vertex(f"c{i}") for i in range(num_c_vertices)]
+
+        # Connect p vertices with d and c vertices based on preferences
+        for i, p_vertex in enumerate(p_vertices):
+            for pref in preferences[i]:
+                # Connect to c vertices
+                self.add_edge(p_vertex, c_vertices[pref], 1)
+                # Connect licensed p vertices to d vertices
+                if i in licenses:
+                    self.add_edge(p_vertex, d_vertices[pref], 1)
+
+        # Connect d vertices to sink with capacity 2
+        for d_vertex in d_vertices:
+            self.add_edge(d_vertex, sink, 2)
+
+        # Connect c vertices to sink with capacity 3
+        for c_vertex in c_vertices:
+            self.add_edge(c_vertex, sink, 3)
 
 class ResidualNetwork(Network):
-    def __init__(self):
+
+    def __init__(self,network):
         super().__init__()
 
     def bfs(self, source, sink, parent):
@@ -95,50 +132,12 @@ class ResidualNetwork(Network):
     def __str__(self):
         return super().__str__()
 
-    def make_network(self, preferences, licenses):
-        # Create source and sink vertices
-        source = self.add_vertex("source")
-        sink = self.add_vertex("sink")
+if __name__ == '__main__':
+    preferences = [[0], [1], [0, 1], [0, 1], [1, 0], [1], [1, 0], [0, 1], [1]]
+    licences = [1, 4, 0, 5, 8]
+    network=Network()
+    network.make_network(preferences, licences)
+    print(network)
+    residual=ResidualNetwork(network)
+    print(residual)
 
-        # Create p vertices and connect them to source
-        p_vertices = [self.add_vertex(f"p{i}") for i in range(len(preferences))]
-        for p_vertex in p_vertices:
-            self.add_edge(source, p_vertex, 1)
-
-        # Create d vertices
-        num_d_vertices = math.ceil(len(preferences) / 5)
-        d_vertices = [self.add_vertex(f"d{i}") for i in range(num_d_vertices)]
-
-        # Create c vertices
-        num_c_vertices = math.ceil(len(preferences) / 5)
-        c_vertices = [self.add_vertex(f"c{i}") for i in range(num_c_vertices)]
-
-        # Connect p vertices with d and c vertices based on preferences
-        for i, p_vertex in enumerate(p_vertices):
-            for pref in preferences[i]:
-                # Connect to c vertices
-                self.add_edge(p_vertex, c_vertices[pref], 1)
-                # Connect licensed p vertices to d vertices
-                if i in licenses:
-                    self.add_edge(p_vertex, d_vertices[pref], 1)
-
-        # Connect d vertices to sink with capacity 2
-        for d_vertex in d_vertices:
-            self.add_edge(d_vertex, sink, 2)
-
-        # Connect c vertices to sink with capacity 3
-        for c_vertex in c_vertices:
-            self.add_edge(c_vertex, sink, 3)
-
-
-# Test the classes
-network = ResidualNetwork()
-v1 = network.add_vertex("A")
-v2 = network.add_vertex("B")
-v3 = network.add_vertex("C")
-network.add_edge(v1, v2, 10)
-network.add_edge(v1, v3, 5)
-network.add_edge(v2, v3, 15)
-print(network)
-network.ford_fulkerson(v1,v3)
-print(network)
