@@ -136,9 +136,19 @@ class ResidualNetwork(Network):
         connected_p_vertices = []
         for vertex in self.vertices:
             if vertex.name.startswith('d') or vertex.name.startswith('c'):
-                p_vertices = [edge.source.name[1:] for edge in self.edges if edge.target == vertex and edge.flow > 0]
+                p_vertices = [int(edge.source.name[1:]) for edge in self.edges if
+                              edge.target == vertex and edge.flow > 0]
                 connected_p_vertices.append(p_vertices)
-        return connected_p_vertices
+
+        # Group every two lists together and flatten them
+        grouped_p_vertices = []
+        for i in range(0, len(connected_p_vertices), 2):
+            grouped_list_1 = connected_p_vertices[i] + connected_p_vertices[i + 2]
+            grouped_list_2 = connected_p_vertices[i + 1] + connected_p_vertices[i + 3]
+            grouped_p_vertices.append(grouped_list_1)
+            grouped_p_vertices.append(grouped_list_2)
+
+        return grouped_p_vertices
 
 def allocate(preferences,licenses):
     preferences=[sorted(sublist) for sublist in preferences]
@@ -149,13 +159,9 @@ def allocate(preferences,licenses):
     return residual.get_connected_p_vertices()
 
 if __name__ == '__main__':
-    preferences = [[0], [1], [0, 1], [0, 1], [0, 1], [1], [0,1], [0, 1], [1]]
+    preferences = [[0], [1], [0, 1], [0, 1], [1, 0], [1], [1, 0], [0, 1], [1]]
     licences = [1, 4, 0, 5, 8]
-    network=Network()
-    network.make_network(preferences, licences)
-    residual=ResidualNetwork(network)
-    residual.ford_fulkerson()
-    print(residual.get_connected_p_vertices())
+    print(allocate(preferences,licences))
 
 
 
