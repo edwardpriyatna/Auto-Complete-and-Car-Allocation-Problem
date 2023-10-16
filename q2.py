@@ -134,21 +134,16 @@ class ResidualNetwork(Network):
 
     def get_connected_p_vertices(self):
         connected_p_vertices = []
-        for vertex in self.vertices:
-            if vertex.name.startswith('d') or vertex.name.startswith('c'):
-                p_vertices = [int(edge.source.name[1:]) for edge in self.edges if
-                              edge.target == vertex and edge.flow > 0]
-                connected_p_vertices.append(p_vertices)
+        d_vertices = [v for v in self.vertices if v.name.startswith('d')]
+        c_vertices = [v for v in self.vertices if v.name.startswith('c')]
 
-        # Group every two lists together and flatten them
-        grouped_p_vertices = []
-        for i in range(0, len(connected_p_vertices), 2):
-            grouped_list_1 = connected_p_vertices[i] + connected_p_vertices[i + 2]
-            grouped_list_2 = connected_p_vertices[i + 1] + connected_p_vertices[i + 3]
-            grouped_p_vertices.append(grouped_list_1)
-            grouped_p_vertices.append(grouped_list_2)
-
-        return grouped_p_vertices
+        for d_vertex, c_vertex in zip(d_vertices, c_vertices):
+            p_vertices_d = [int(edge.source.name[1:]) for edge in self.edges if
+                            edge.target == d_vertex and edge.flow > 0 and edge.source.name.startswith('p')]
+            p_vertices_c = [int(edge.source.name[1:]) for edge in self.edges if
+                            edge.target == c_vertex and edge.flow > 0 and edge.source.name.startswith('p')]
+            connected_p_vertices.append(p_vertices_d + p_vertices_c)
+        return connected_p_vertices
 
 def allocate(preferences,licenses):
     preferences=[sorted(sublist) for sublist in preferences]
@@ -156,12 +151,15 @@ def allocate(preferences,licenses):
     network.make_network(preferences,licenses)
     residual=ResidualNetwork(network)
     residual.ford_fulkerson()
+    print(residual)
     return residual.get_connected_p_vertices()
+
 
 if __name__ == '__main__':
     preferences = [[0], [1], [0, 1], [0, 1], [1, 0], [1], [1, 0], [0, 1], [1]]
     licences = [1, 4, 0, 5, 8]
     print(allocate(preferences,licences))
+
 
 
 
