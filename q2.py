@@ -19,10 +19,10 @@ class Edge:
     def __str__(self):
         return f"{self.source} -> {self.target} | Capacity: {self.capacity} | Flow: {self.flow}"
 
-
 class Network:
     def __init__(self):
         self.vertices = []
+        self.edges=[]
 
     def add_vertex(self, name):
         vertex = Vertex(name)
@@ -32,6 +32,7 @@ class Network:
     def add_edge(self, source, target, capacity):
         edge = Edge(source, target, capacity)
         source.edges.append(edge)
+        self.edges.append(edge)
         return edge
 
     def __str__(self):
@@ -56,18 +57,20 @@ class Network:
         num_d_vertices = math.ceil(len(preferences) / 5)
         d_vertices = [self.add_vertex(f"d{i}") for i in range(num_d_vertices)]
 
+        # Connect p vertices with d vertices based on preferences and licenses
+        for i, p_vertex in enumerate(p_vertices):
+            if i in licenses:
+                for pref in preferences[i]:
+                    self.add_edge(p_vertex, d_vertices[pref], 1)
+
         # Create c vertices
         num_c_vertices = math.ceil(len(preferences) / 5)
         c_vertices = [self.add_vertex(f"c{i}") for i in range(num_c_vertices)]
 
-        # Connect p vertices with d and c vertices based on preferences
+        # Connect p vertices with c vertices based on preferences
         for i, p_vertex in enumerate(p_vertices):
             for pref in preferences[i]:
-                # Connect to c vertices
                 self.add_edge(p_vertex, c_vertices[pref], 1)
-                # Connect licensed p vertices to d vertices
-                if i in licenses:
-                    self.add_edge(p_vertex, d_vertices[pref], 1)
 
         # Connect d vertices to sink with capacity 2
         for d_vertex in d_vertices:
@@ -81,63 +84,71 @@ class ResidualNetwork(Network):
 
     def __init__(self,network):
         super().__init__()
-
-    def bfs(self, source, sink, parent):
-        visited = [False] * len(self.vertices)
-        queue = []
-        queue.append(source)
-        visited[self.vertices.index(source)] = True
-
-        while queue:
-            u = queue.pop(0)
-
-            for edge in u.edges:
-                v = edge.target
-                if (not visited[self.vertices.index(v)]) and (edge.capacity - edge.flow > 0):
-                    queue.append(v)
-                    visited[self.vertices.index(v)] = True
-                    parent[self.vertices.index(v)] = u
-
-        return visited[self.vertices.index(sink)]
-
-    def ford_fulkerson(self, source, sink):
-        parent = [-1] * len(self.vertices)
-        max_flow = 0
-
-        while self.bfs(source, sink, parent):
-            path_flow = float("inf")
-            s = sink
-
-            while s != source:
-                u = parent[self.vertices.index(s)]
-                for edge in u.edges:
-                    if edge.target == s:
-                        path_flow = min(path_flow, edge.capacity - edge.flow)
-                        break
-                s = u
-
-            max_flow += path_flow
-            v = sink
-
-            while v != source:
-                u = parent[self.vertices.index(v)]
-                for edge in u.edges:
-                    if edge.target == v:
-                        edge.flow += path_flow
-                        break
-                v = u
-
-        return max_flow
+        self.vertices = network.vertices
+        self.edges = network.edges
 
     def __str__(self):
         return super().__str__()
 
+    def bfs(self, source, sink, parent):
+        visited = [False] * len(self.vertices)
+        queue = [source]
+        visited[self.vertices.index(source)] = True
+
+        while queue:
+            u = queue.pop(0)  # pop from the beginning of the list
+
+            for edge in u.edges:
+                residual_capacity = edge.capacity - edge.flow
+                if visited[self.vertices.index(edge.target)] == False and residual_capacity > 0:
+                    queue.append(edge.target)
+                    visited[self.vertices.index(edge.target)] = True
+                    parent[self.vertices.index(edge.target)] = u
+
+        return True if visited[self.vertices.index(sink)] else False
+
+    def ford_fulkerson(self):
+        source=self.vertices[0]
+        sink=self.vertices[1]
+        parent = [-1] * len(self.vertices)
+        max_flow = 0
+
+        while self.bfs(source, sink, parent):
+            path_flow = float("Inf")
+            s = sink
+            while (s != source):
+                for edge in self.edges:
+                    if edge.target == s and edge.source == parent[self.vertices.index(s)]:
+                        path_flow = min(path_flow, edge.capacity - edge.flow)
+                        break
+                s = parent[self.vertices.index(s)]
+
+            max_flow += path_flow
+            v = sink
+            while (v != source):
+                for edge in self.edges:
+                    if edge.target == v and edge.source == parent[self.vertices.index(v)]:
+                        edge.flow += path_flow
+                        break
+                v = parent[self.vertices.index(v)]
+
+    def get_connected_p_vertices(self):
+        connected_p_vertices = []
+        for vertex in self.vertices:
+            if vertex.name.startswith('d') or vertex.name.startswith('c'):
+                p_vertices = [edge.source.name[1:] for edge in self.edges if edge.target == vertex and edge.flow > 0]
+                connected_p_vertices.append(p_vertices)
+        return connected_p_vertices
+
 if __name__ == '__main__':
-    preferences = [[0], [1], [0, 1], [0, 1], [1, 0], [1], [1, 0], [0, 1], [1]]
+    preferences = [[0], [1], [0, 1], [0, 1], [0, 1], [1], [0,1], [0, 1], [1]]
     licences = [1, 4, 0, 5, 8]
     network=Network()
     network.make_network(preferences, licences)
-    print(network)
     residual=ResidualNetwork(network)
-    print(residual)
+    residual.ford_fulkerson()
+    print(residual.get_connected_p_vertices())
+
+
+
 
