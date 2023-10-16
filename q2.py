@@ -152,6 +152,7 @@ def allocate(preferences,licenses):
     network.make_network(preferences,licenses)
     residual=ResidualNetwork(network)
     max_flow= residual.ford_fulkerson()
+    print(residual)
     if max_flow<len(preferences):
         return None
     solution=residual.get_connected_p_vertices()
