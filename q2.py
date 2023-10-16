@@ -131,6 +131,7 @@ class ResidualNetwork(Network):
                         edge.flow += path_flow
                         break
                 v = parent[self.vertices.index(v)]
+        return max_flow
 
     def get_connected_p_vertices(self):
         connected_p_vertices = []
@@ -150,10 +151,12 @@ def allocate(preferences,licenses):
     network=Network()
     network.make_network(preferences,licenses)
     residual=ResidualNetwork(network)
-    residual.ford_fulkerson()
-    print(residual)
-    return residual.get_connected_p_vertices()
-
+    max_flow= residual.ford_fulkerson()
+    if max_flow<len(preferences):
+        return None
+    solution=residual.get_connected_p_vertices()
+    print(solution)
+    return solution
 
 if __name__ == '__main__':
     preferences = [[0], [1], [0, 1], [0, 1], [1, 0], [1], [1, 0], [0, 1], [1]]
