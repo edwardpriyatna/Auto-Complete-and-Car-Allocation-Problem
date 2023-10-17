@@ -4,20 +4,33 @@ class Vertex:
     def __init__(self, name):
         self.name = name
         self.edges = []  # list of edges connected to this vertex
+        self.residual_edges = []  # list of residual edges connected to this vertex
+        self.visited = False
+        self.predecessor = None  # predecessor edge during BFS traversal
 
     def __str__(self):
         return self.name
 
-
 class Edge:
-    def __init__(self, source, target, capacity):
-        self.source = source
+    def __init__(self, origin, target, capacity):
+        self.origin = origin
         self.target = target
         self.capacity = capacity
         self.flow = 0
 
     def __str__(self):
-        return f"{self.source} -> {self.target} | Capacity: {self.capacity} | Flow: {self.flow}"
+        return f"{self.origin} -> {self.target} | Capacity: {self.capacity} | Flow: {self.flow}"
+
+class ResidualEdge(Edge):
+    def __init__(self, origin, target, capacity, original_edge=None):
+        super().__init__(origin, target, capacity)
+        self.original_edge = original_edge  # Reference to the original edge in the flow network
+        self.forward_flow = 0
+        self.backward_flow = 0
+
+    def __str__(self):
+        return f"{self.origin} -> {self.target} | Capacity: {self.capacity} " \
+               f"| Forward Flow: {self.forward_flow}| Backward Flow: {self.backward_flow}"
 
 class Network:
     def __init__(self):
@@ -76,93 +89,118 @@ class Network:
         for d_vertex in d_vertices:
             self.add_edge(d_vertex, sink, 2)
 
-        # Connect c vertices to sink with capacity 3
+        # Create vertex e
+        e_vertex = self.add_vertex("e")
+
+        # Connect c vertices to vertex e with capacity 3
         for c_vertex in c_vertices:
-            self.add_edge(c_vertex, sink, 3)
+            self.add_edge(c_vertex, e_vertex, 3)
 
-class ResidualNetwork(Network):
+        # Connect vertex e to sink
+        self.add_edge(e_vertex, sink, 3 * math.ceil(len(preferences) / 5))
 
-    def __init__(self,network):
-        super().__init__()
-        self.vertices = network.vertices
-        self.edges = network.edges
+
+class ResidualNetwork:
+    def __init__(self, network):
+        self.vertices = network.vertices.copy()
+        self.edges = []
+        self.residual_edges=[]
+        self._create_residual_edges(network.edges)
+
+    def _create_residual_edges(self, edges):
+        for edge in edges:
+            # Forward flow in the residual graph
+            forward_flow = edge.capacity - edge.flow
+            # Backward flow in the residual graph
+            backward_flow = edge.capacity-forward_flow
+
+            # Create the residual edge with both forward and backward flows and reference to the original edge
+            residual_edge = ResidualEdge(edge.origin, edge.target, edge.capacity, original_edge=edge)
+            residual_edge.forward_flow = forward_flow
+            residual_edge.backward_flow = backward_flow
+
+            # Add the residual edge to the respective vertices and to the global list
+            edge.origin.residual_edges.append(residual_edge)
+            self.residual_edges.append(residual_edge)
 
     def __str__(self):
-        return super().__str__()
+        result = "Residual Network:\n"
+        for v in self.vertices:
+            result += f"Vertex: {v}\n"
+            for e in v.residual_edges:
+                result += f"  {e}\n"
+        return result
 
-    def bfs(self, source, sink, parent):
-        visited = [False] * len(self.vertices)
-        queue = [source]
-        visited[self.vertices.index(source)] = True
+    def _reset_visited_status(self):
+        for vertex in self.vertices:
+            vertex.visited = False
 
-        while queue:
-            u = queue.pop(0)  # pop from the beginning of the list
+    def has_augmenting_path(self, origin, destination):
+        # Reset visited status of all vertices
+        self._reset_visited_status()
 
-            for edge in u.edges:
-                residual_capacity = edge.capacity - edge.flow
-                if visited[self.vertices.index(edge.target)] == False and residual_capacity > 0:
-                    queue.append(edge.target)
-                    visited[self.vertices.index(edge.target)] = True
-                    parent[self.vertices.index(edge.target)] = u
+        # Initialize BFS list with the origin vertex
+        bfs_list = [origin]
+        origin.visited = True
 
-        return True if visited[self.vertices.index(sink)] else False
+        for current_vertex in bfs_list:
+            if current_vertex == destination:
+                return True
 
-    def ford_fulkerson(self):
-        source=self.vertices[0]
-        sink=self.vertices[1]
-        parent = [-1] * len(self.vertices)
-        max_flow = 0
+            for edge in current_vertex.residual_edges:
+                # Check if the edge has capacity for more flow (i.e., backward_flow < capacity)
+                if not edge.target.visited and edge.backward_flow < edge.capacity:
+                    edge.target.visited = True
+                    bfs_list.append(edge.target)
+        return False
 
-        while self.bfs(source, sink, parent):
-            path_flow = float("Inf")
-            s = sink
-            while (s != source):
-                for edge in self.edges:
-                    if edge.target == s and edge.source == parent[self.vertices.index(s)]:
-                        path_flow = min(path_flow, edge.capacity - edge.flow)
-                        break
-                s = parent[self.vertices.index(s)]
+    def get_augmenting_path(self, origin, destination):
+        # Reset visited status of all vertices
+        self._reset_visited_status()
 
-            max_flow += path_flow
-            v = sink
-            while (v != source):
-                for edge in self.edges:
-                    if edge.target == v and edge.source == parent[self.vertices.index(v)]:
-                        edge.flow += path_flow
-                        break
-                v = parent[self.vertices.index(v)]
-        return max_flow
+        # Initialize BFS list with the origin vertex
+        bfs_list = [origin]
+        origin.visited = True
 
-    def get_connected_p_vertices(self):
-        connected_p_vertices = []
-        d_vertices = [v for v in self.vertices if v.name.startswith('d')]
-        c_vertices = [v for v in self.vertices if v.name.startswith('c')]
+        path_found = False
+        for current_vertex in bfs_list:
+            if current_vertex == destination:
+                path_found = True
+                break
 
-        for d_vertex, c_vertex in zip(d_vertices, c_vertices):
-            p_vertices_d = [int(edge.source.name[1:]) for edge in self.edges if
-                            edge.target == d_vertex and edge.flow > 0 and edge.source.name.startswith('p')]
-            p_vertices_c = [int(edge.source.name[1:]) for edge in self.edges if
-                            edge.target == c_vertex and edge.flow > 0 and edge.source.name.startswith('p')]
-            connected_p_vertices.append(p_vertices_d + p_vertices_c)
-        return connected_p_vertices
+            for edge in current_vertex.residual_edges:  # Assuming you store residual edges in 'edges' attribute
+                # Check if the edge has capacity for more flow (i.e., backward_flow < capacity)
+                if not edge.target.visited and edge.backward_flow < edge.capacity:
+                    edge.target.visited = True
+                    bfs_list.append(edge.target)
+                    # Set the edge through which the vertex was reached as its predecessor
+                    edge.target.predecessor = edge
 
-def allocate(preferences,licenses):
-    preferences=[sorted(sublist) for sublist in preferences]
-    network=Network()
-    network.make_network(preferences,licenses)
-    residual=ResidualNetwork(network)
-    max_flow= residual.ford_fulkerson()
-    print(residual)
-    if max_flow<len(preferences):
-        return None
-    solution=residual.get_connected_p_vertices()
-    print(solution)
-    return solution
+        # If a path is found, reconstruct it using the predecessor attribute
+        if path_found:
+            path = []
+            current_vertex = destination
+            while current_vertex != origin:
+                edge = current_vertex.predecessor
+                path.append(edge)
+                current_vertex = edge.origin  # Go to the vertex from which the current vertex was reached
+            return path[::-1]  # Reverse the path to get it in the correct order from origin to destination
+
+        return None  # Return None if no path is found
 
 if __name__ == '__main__':
     preferences = [[0], [1], [0, 1], [0, 1], [1, 0], [1], [1, 0], [0, 1], [1]]
     licences = [1, 4, 0, 5, 8]
-    print(allocate(preferences,licences))
+    network=Network()
+    network.make_network(preferences,licences)
+    residual=ResidualNetwork(network)
+    #print(residual)
+    print(residual.has_augmenting_path(residual.vertices[7],residual.vertices[1]))
+    path7to1= residual.get_augmenting_path(residual.vertices[7],residual.vertices[1])
+    print(path7to1)
+    for path in path7to1:
+        print(path)
+
 
 
 
