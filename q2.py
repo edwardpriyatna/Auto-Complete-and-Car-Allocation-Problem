@@ -196,21 +196,18 @@ class ResidualNetwork:
             # Add the minimum forward_flow to the backward_flow, ensuring it doesn't exceed the edge's capacity
             edge.backward_flow = min(edge.capacity, edge.backward_flow + min_forward_flow)
 
+    def ford_fulkerson(self):
+        while self.has_augmenting_path(self.vertices[0],self.vertices[1]):
+            path=self.get_augmenting_path(self.vertices[0],self.vertices[1])
+            self.augment_path(path)
+
 if __name__ == '__main__':
     preferences = [[0], [1], [0, 1], [0, 1], [1, 0], [1], [1, 0], [0, 1], [1]]
     licences = [1, 4, 0, 5, 8]
     network=Network()
     network.make_network(preferences,licences)
     residual=ResidualNetwork(network)
-    #print(residual)
-    print(residual.has_augmenting_path(residual.vertices[7],residual.vertices[1]))
-    path7to1= residual.get_augmenting_path(residual.vertices[7],residual.vertices[1])
-    print(path7to1)
-    for path in path7to1:
-        print(path)
-    residual.augment_path(path7to1)
-    for path in path7to1:
-        print(path)
+    residual.ford_fulkerson()
     print(residual)
 
 
