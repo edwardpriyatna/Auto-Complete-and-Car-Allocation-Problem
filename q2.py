@@ -207,8 +207,6 @@ if __name__ == '__main__':
     network=Network()
     network.make_network(preferences,licences)
     residual=ResidualNetwork(network)
-    residual.ford_fulkerson()
     print(residual)
-
 
 
