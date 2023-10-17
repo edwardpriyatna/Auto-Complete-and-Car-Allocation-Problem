@@ -185,8 +185,16 @@ class ResidualNetwork:
                 path.append(edge)
                 current_vertex = edge.origin  # Go to the vertex from which the current vertex was reached
             return path[::-1]  # Reverse the path to get it in the correct order from origin to destination
-
         return None  # Return None if no path is found
+
+    def augment_path(self, path):
+        # Identify the edge with the lowest forward_flow in the path
+        min_forward_flow = min(edge.forward_flow for edge in path)
+
+        # Update the backward_flow for each edge in the path
+        for edge in path:
+            # Add the minimum forward_flow to the backward_flow, ensuring it doesn't exceed the edge's capacity
+            edge.backward_flow = min(edge.capacity, edge.backward_flow + min_forward_flow)
 
 if __name__ == '__main__':
     preferences = [[0], [1], [0, 1], [0, 1], [1, 0], [1], [1, 0], [0, 1], [1]]
@@ -200,9 +208,10 @@ if __name__ == '__main__':
     print(path7to1)
     for path in path7to1:
         print(path)
-
-
-
+    residual.augment_path(path7to1)
+    for path in path7to1:
+        print(path)
+    print(residual)
 
 
 
