@@ -20,7 +20,7 @@ class Edge:
         self.rev=None
 
     def add_reverse_edge(self):
-        reverse_edge = Edge(self.t, self.s, 0)
+        reverse_edge = Edge(self.t, self.s, self.cap)
         reverse_edge.rev = self
         self.rev = reverse_edge
         self.s.edges.append(reverse_edge)  # add reverse edge to source vertex's edges list
@@ -90,10 +90,10 @@ class Network:
 
         # Connect c vertices to vertex e with capacity 3
         for c_vertex in c_vertices:
-            self.add_edge(c_vertex, e_vertex, 1)
+            self.add_edge(c_vertex, e_vertex, 3)
 
         # Connect vertex e to sink
-        self.add_edge(e_vertex, sink, 1)
+        self.add_edge(e_vertex, sink, len(preferences) - 2*math.ceil(len(preferences) / 5))
 
 class ResidualNetwork:
     def __init__(self, network):
@@ -144,42 +144,47 @@ class ResidualNetwork:
         return True
 
     def edmonds_karp(self):
-        flow=0
-        source=self.vertices[0]
-        sink=self.vertices[1]
-        pred = [None] * len(self.vertices)
-        print(pred)
-        while pred[sink.id] is not None:
-            print('enter loop')
+        flow = 0
+        source = self.vertices[0]
+        sink = self.vertices[1]
+
+        while True:  # Keep looping until no augmenting path is found
+            pred = [None] * len(self.vertices)
             q = queue.Queue()
             q.put(source)
-            while not q.empty() and pred[sink.id] is not None:
-                cur=q.get()
+
+            while not q.empty():
+                cur = q.get()
                 for e in cur.edges:
                     if pred[e.t.id] is None and e.t != source and e.cap > e.flow:
                         pred[e.t.id] = e
                         q.put(e.t)
+
+            if pred[sink.id] is None:  # No augmenting path was found
+                break
 
             df = float('inf')
             e = pred[sink.id]
             while e is not None:
                 df = min(df, e.cap - e.flow)
                 e = pred[e.s.id]
+
             e = pred[sink.id]
             while e is not None:
                 e.flow = e.flow + df
                 e.rev.flow = e.rev.flow - df
                 e = pred[e.s.id]
+
             flow = flow + df
+
         return flow
 
 if __name__ == '__main__':
-    preferences = [[1], [0, 1], [0], [0,1], [0], [0]]
-    licences = [0, 1, 2, 4]
+    preferences = [[0], [1], [0, 1], [0, 1], [1, 0], [1], [1, 0], [0, 1], [1]]
+    licences = [1, 4, 0, 5, 8]
     network=Network()
     network.make_network(preferences,licences)
     residual=ResidualNetwork(network)
-    print(residual)
     print(residual.edmonds_karp())
 
 
