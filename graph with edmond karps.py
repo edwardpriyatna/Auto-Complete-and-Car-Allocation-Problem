@@ -1,146 +1,122 @@
-import math
-
 class Vertex:
-    def __init__(self, name):
+    def __init__(self, name, source=False, sink=False):
         self.name = name
-        self.edges = []  # list of edges connected to this vertex
-        self.residual_edges = []  # list of residual edges connected to this vertex
-        self.visited = False
-        self.predecessor = None  # predecessor edge during BFS traversal
-
-    def __str__(self):
-        return self.name
+        self.source = source
+        self.sink = sink
+        self.edges = []  # each vertex now has its own edges list
 
 class Edge:
-    def __init__(self, origin, target, capacity):
-        self.origin = origin
-        self.target = target
+    def __init__(self, start, end, capacity):
+        self.start = start
+        self.end = end
         self.capacity = capacity
         self.flow = 0
+        self.returnEdge = None
 
-    def __str__(self):
-        return f"{self.origin} -> {self.target} | Capacity: {self.capacity} | Flow: {self.flow}"
-
-class Network:
+class FlowNetwork:
     def __init__(self):
         self.vertices = []
-        self.edges = []
 
-    def add_vertex(self, name):
-        vertex = Vertex(name)
-        self.vertices.append(vertex)
-        return vertex
-
-    def add_edge(self, source, target, capacity):
-        edge = Edge(source, target, capacity)
-        source.edges.append(edge)
-        self.edges.append(edge)
-        return edge
-
-    def has_path(self, source, sink):
-        # Reset visited state of all vertices
+    def getSource(self):
         for vertex in self.vertices:
-            vertex.visited = False
+            if vertex.source:
+                return vertex
+        return None
 
-        # Use BFS to find if a path exists
-        queue = [source]
-        while queue:
-            vertex = queue.pop(0)
-            vertex.visited = True
-            if vertex == sink:
+    def getSink(self):
+        for vertex in self.vertices:
+            if vertex.sink:
+                return vertex
+        return None
+
+    def getVertex(self, name):
+        for vertex in self.vertices:
+            if name == vertex.name:
+                return vertex
+
+    def vertexInNetwork(self, name):
+        for vertex in self.vertices:
+            if vertex.name == name:
                 return True
-            for edge in vertex.edges:
-                residual_capacity = edge.capacity - edge.flow
-                if residual_capacity > 0 and not edge.target.visited:
-                    edge.target.visited = True
-                    queue.append(edge.target)
         return False
 
-    def get_path(self, source, sink):
-        # Reset visited state of all vertices and predecessors of all vertices
+    def getEdges(self):
+        allEdges = []
         for vertex in self.vertices:
-            vertex.visited = False
-            vertex.predecessor = None
-
-        # Use BFS to find the shortest path
-        queue = [source]
-        while queue:
-            vertex = queue.pop(0)
-            vertex.visited = True
-            if vertex == sink:
-                break
             for edge in vertex.edges:
-                residual_capacity = edge.capacity - edge.flow
-                if residual_capacity > 0 and not edge.target.visited:
-                    edge.target.visited = True
-                    edge.target.predecessor = edge  # Set predecessor of the destination vertex
-                    queue.append(edge.target)
+                allEdges.append(edge)
+        return allEdges
 
-        # Backtrack to find the path from source to sink using the predecessor attribute of each vertex
-        path = []
-        current_vertex = sink
-        while current_vertex is not None and current_vertex.predecessor is not None:
-            path.insert(0, current_vertex.predecessor)
-            current_vertex = current_vertex.predecessor.origin
+    def addVertex(self, name, source=False, sink=False):
+        if source and sink:
+            return "Vertex cannot be source and sink"
+        if self.vertexInNetwork(name):
+            return "Duplicate vertex"
+        if source:
+            if self.getSource() != None:
+                return "Source already Exists"
+        if sink:
+            if self.getSink() != None:
+                return "Sink already Exists"
+        newVertex = Vertex(name, source, sink)
+        self.vertices.append(newVertex)
 
-        return path if len(path) > 0 else None
+    def addEdge(self, start, end, capacity):
+        if start == end:
+            return "Cannot have same start and end"
+        if not self.vertexInNetwork(start):
+            return "Start vertex has not been added yet"
+        if not self.vertexInNetwork(end):
+            return "End vertex has not been added yet"
+        newEdge = Edge(start, end, capacity)
+        returnEdge = Edge(end, start, 0)
+        newEdge.returnEdge = returnEdge
+        returnEdge.returnEdge = newEdge
+        startVertex = self.getVertex(start)
+        startVertex.edges.append(newEdge)
+        endVertex = self.getVertex(end)
+        endVertex.edges.append(returnEdge)
 
-    def __str__(self):
-        result = "Network:\n"
-        for v in self.vertices:
-            result += f"Vertex: {v}\n"
-            for e in v.edges:
-                result += f"  {e}\n"
-        return result
+    def getPath(self, start, end, path):
+        if start == end:
+            return path
+        startVertex = self.getVertex(start)
+        for edge in startVertex.edges:
+            residualCapacity = edge.capacity - edge.flow
+            if residualCapacity > 0 and not (edge, residualCapacity) in path:
+                result = self.getPath(edge.end, end, path + [(edge, residualCapacity)])
+                if result != None:
+                    return result
 
-    def make_network(self, preferences, licenses):
-        source = self.add_vertex('source')
-        sink = self.add_vertex('sink')
-
-        # Create p vertices and connect them to the source
-        p_vertices = []
-        for i in licenses:
-            p_vertex = self.add_vertex(f'p{i}')
-            self.add_edge(source, p_vertex, 1)
-            p_vertices.append(p_vertex)
-
-        # Create d vertices
-        d_vertices = []
-        for i in range(math.ceil(len(preferences) / 5)):
-            d_vertex = self.add_vertex(f'd{i}')
-            d_vertices.append(d_vertex)
-
-        # Connect p vertices to d vertices based on preferences
-        for p_vertex in p_vertices:
-            i = int(p_vertex.name[1:])  # Get the index from the name of the p vertex
-            for j in preferences[i]:
-                self.add_edge(p_vertex, d_vertices[j], 1)
-
-        # Connect d vertices to the sink
-        for d_vertex in d_vertices:
-            self.add_edge(d_vertex, sink, 2)
-
-    def edmonds_karp(self, source, sink):
-        # Initialize flow to 0 for all edges
-        for edge in self.edges:
-            edge.flow = 0
-
-        while self.has_path(source, sink):
-            # Find the path and calculate the minimum residual capacity
-            path = self.get_path(source, sink)
-            min_residual_capacity = min(edge.capacity - edge.flow for edge in path)
-
-            # Augment the flow along the path
-            for edge in path:
-                edge.flow += min_residual_capacity
-
-        # The maximum flow is the sum of flows into the sink
-        return sum(edge.flow for edge in sink.edges)
+    def calculateMaxFlow(self):
+        source = self.getSource()
+        sink = self.getSink()
+        if source == None or sink == None:
+            return "Network does not have source and sink"
+        path = self.getPath(source.name, sink.name, [])
+        while path != None:
+            flow = min(edge[1] for edge in path)
+            for edge, res in path:
+                edge.flow += flow
+                edge.returnEdge.flow -= flow
+            path = self.getPath(source.name, sink.name, [])
+        sourceEdges = self.getVertex(source.name).edges
+        return sum(edge.flow for edge in sourceEdges)
 
 if __name__ == '__main__':
-    preferences = [[0], [1], [0, 1], [0, 1], [1, 0], [1], [1, 0], [0, 1], [1]]
-    licences = [1, 4, 0, 5, 8]
-    network=Network()
-    network.make_network(preferences,licences)
-    network.edmonds_karp(network.vertices[0],network.vertices[1])
-    print(network)
+    # Setting up the flow network for the described scenario
+    network_suboptimal = FlowNetwork()
+    network_suboptimal.addVertex("s", source=True)
+    network_suboptimal.addVertex("t", sink=True)
+    network_suboptimal.addVertex("a")
+    network_suboptimal.addVertex("b")
+    network_suboptimal.addEdge("s", "a", 10)
+    network_suboptimal.addEdge("s", "b", 1)
+    network_suboptimal.addEdge("a", "b", 1)
+    network_suboptimal.addEdge("a", "t", 10)
+    network_suboptimal.addEdge("b", "t", 10)
+
+    # Calculate max flow
+    max_flow_suboptimal = network_suboptimal.calculateMaxFlow()
+    print(max_flow_suboptimal)
+
