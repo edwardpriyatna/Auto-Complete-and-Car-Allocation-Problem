@@ -1,4 +1,6 @@
 import math
+import queue
+import array
 
 class Vertex:
     def __init__(self,id,name):
@@ -111,6 +113,20 @@ class ResidualNetwork:
             for e in v.edges:
                 result += f"  {e}\n"
         return result
+
+    def BFS(self):
+        q = queue.Queue()
+        q.put(self.vertices[0])
+        pred = []
+        while not q.empty() and pred[self.vertices[1]] is None:
+            cur = q.get()
+            for e in self.vertices[cur].edges:
+                if pred[e.t] is None and e.t is not self.vertices[0] and e.cap > e.flow:
+                    pred[e.t] = e
+                    q.put(e.t)
+        if pred[self.vertices[1]] is not None:
+            return pred
+        return None
 
 if __name__ == '__main__':
     preferences = [[0], [1], [0, 1], [0, 1], [1, 0], [1], [1, 0], [0, 1], [1]]
