@@ -5,6 +5,14 @@ class Vertex:
         self.sink = sink
         self.edges = []  # each vertex now has its own edges list
 
+    def __str__(self):
+        vertex_type = ""
+        if self.source:
+            vertex_type = "(Source)"
+        elif self.sink:
+            vertex_type = "(Sink)"
+        return f"Vertex {self.name} {vertex_type}"
+
 class Edge:
     def __init__(self, start, end, capacity):
         self.start = start
@@ -13,9 +21,17 @@ class Edge:
         self.flow = 0
         self.returnEdge = None
 
+    def __str__(self):
+        return f"Edge ({self.start} -> {self.end}) | Flow: {self.flow} | Capacity: {self.capacity}"
+
 class FlowNetwork:
     def __init__(self):
         self.vertices = []
+
+    def __str__(self):
+        vertices_str = "\n".join(str(vertex) for vertex in self.vertices)
+        edges_str = "\n".join(str(edge) for edge in self.getEdges())
+        return f"Flow Network:\n\nVertices:\n{vertices_str}\n\nEdges:\n{edges_str}"
 
     def getSource(self):
         for vertex in self.vertices:
@@ -104,19 +120,36 @@ class FlowNetwork:
         return sum(edge.flow for edge in sourceEdges)
 
 if __name__ == '__main__':
-    # Setting up the flow network for the described scenario
-    network_suboptimal = FlowNetwork()
-    network_suboptimal.addVertex("s", source=True)
-    network_suboptimal.addVertex("t", sink=True)
-    network_suboptimal.addVertex("a")
-    network_suboptimal.addVertex("b")
-    network_suboptimal.addEdge("s", "a", 10)
-    network_suboptimal.addEdge("s", "b", 1)
-    network_suboptimal.addEdge("a", "b", 1)
-    network_suboptimal.addEdge("a", "t", 10)
-    network_suboptimal.addEdge("b", "t", 10)
+    # Setting up the flow network for the described bipartite matching scenario
+    bipartite_network = FlowNetwork()
 
-    # Calculate max flow
-    max_flow_suboptimal = network_suboptimal.calculateMaxFlow()
-    print(max_flow_suboptimal)
+    # Adding vertices
+    bipartite_network.addVertex("source", source=True)
+    bipartite_network.addVertex("sink", sink=True)
+    bipartite_network.addVertex("1")
+    bipartite_network.addVertex("2")
+    bipartite_network.addVertex("3")
+    bipartite_network.addVertex("4")
+    bipartite_network.addVertex("6")
+    bipartite_network.addVertex("7")
+
+    # Adding edges
+    bipartite_network.addEdge("source", "1", 1)
+    bipartite_network.addEdge("source", "2", 1)
+    bipartite_network.addEdge("source", "3", 1)
+    bipartite_network.addEdge("source", "4", 1)
+
+    bipartite_network.addEdge("1", "7", 1)
+    bipartite_network.addEdge("2", "6", 1)
+    bipartite_network.addEdge("2", "7", 1)
+    bipartite_network.addEdge("3", "6", 1)
+    bipartite_network.addEdge("4", "6", 1)
+
+    bipartite_network.addEdge("6", "sink", 2)
+    bipartite_network.addEdge("7", "sink", 2)
+
+    # Calculating max flow (which will represent the maximum matching)
+    max_matching = bipartite_network.calculateMaxFlow()
+    print(bipartite_network)
+
 
