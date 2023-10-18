@@ -1,3 +1,5 @@
+import math
+
 class Vertex:
     def __init__(self, name, source=False, sink=False):
         self.name = name
@@ -119,53 +121,80 @@ class FlowNetwork:
         sourceEdges = self.getVertex(source.name).edges
         return sum(edge.flow for edge in sourceEdges)
 
+    def create_bipartite_graph(self, preferences, licenses):
+        # Create source and sink vertices
+        self.addVertex("source", source=True)
+        self.addVertex("sink", sink=True)
+
+        # Create vertices 0,1,...,len(preferences)-1 and connect them to source
+        for i in range(len(preferences)):
+            self.addVertex(str(i))
+            self.addEdge("source", str(i), 1)
+
+        # Create d vertices and connect them to sink
+        num_d_vertices = math.ceil(len(preferences) / 5)
+        for i in range(num_d_vertices):
+            self.addVertex(f"d{i}")
+            self.addEdge(f"d{i}", "sink", 2)
+
+        # Connect number vertices to d vertices based on preferences and licenses
+        for i, pref in enumerate(preferences):
+            if i in licenses:
+                for p in pref:
+                    self.addEdge(str(i), f"d{p}", 1)
+
+        # Create c vertices
+        for i in range(num_d_vertices):
+            self.addVertex(f"c{i}")
+
+        # Connect number vertices to c vertices based on preferences
+        for i, pref in enumerate(preferences):
+            for p in pref:
+                # Since the preferences for d and c vertices are the same, we can reuse the logic here
+                self.addEdge(str(i), f"c{p}", 1)
+
+        # Create vertex e and connect c vertices to e
+        self.addVertex("e")
+        for i in range(num_d_vertices):
+            self.addEdge(f"c{i}", "e", 3)
+
+        # Connect e to sink
+        self.addEdge("e", "sink", len(preferences) - 2 * math.ceil(len(preferences) / 5))
+
+    def getResults(self):
+        results = []
+
+        num_d_vertices = math.ceil(len(self.vertices) / 5)  # Assuming this based on earlier structure
+
+        # For each d and c vertex pair, gather the connected number vertices
+        for i in range(num_d_vertices):
+            combined_list = []
+
+            # Check each numbered vertex for connections to d or c vertices
+            for v in self.vertices:
+                if v.name.isnumeric():
+                    for edge in v.edges:
+                        if edge.flow > 0 and edge.end == f"d{i}":
+                            combined_list.append(int(v.name))
+                        elif edge.flow > 0 and edge.end == f"c{i}":
+                            combined_list.append(int(v.name))
+
+            if combined_list:  # Only add if there's a valid connection
+                results.append(combined_list)
+
+        return results
+
+def allocate(preferences, licenses):
+    network = FlowNetwork()
+    network.create_bipartite_graph(preferences, licenses)
+    network.calculateMaxFlow()
+    return test_network.getResults()
+
 if __name__ == '__main__':
-    # Setting up the flow network for the described bipartite matching scenario
-    bipartite_network_2 = FlowNetwork()
-
-    # Adding vertices
-    bipartite_network_2.addVertex("source", source=True)
-    bipartite_network_2.addVertex("sink", sink=True)
-    for i in range(6):
-        bipartite_network_2.addVertex(f"p{i}")
-    bipartite_network_2.addVertex("d0")
-    bipartite_network_2.addVertex("d1")
-    bipartite_network_2.addVertex("c0")
-    bipartite_network_2.addVertex("c1")
-    bipartite_network_2.addVertex("e")
-
-    # Adding edges
-    for i in range(6):
-        bipartite_network_2.addEdge("source", f"p{i}", 1)
-
-    bipartite_network_2.addEdge("p0", "d1", 1)
-    bipartite_network_2.addEdge("p1", "d0", 1)
-    bipartite_network_2.addEdge("p1", "d1", 1)
-    bipartite_network_2.addEdge("p2", "d0", 1)
-    bipartite_network_2.addEdge("p4", "d0", 1)
-
-    bipartite_network_2.addEdge("d0", "sink", 2)
-    bipartite_network_2.addEdge("d1", "sink", 2)
-
-    bipartite_network_2.addEdge("p0", "c1", 1)
-    bipartite_network_2.addEdge("p1", "c0", 1)
-    bipartite_network_2.addEdge("p1", "c1", 1)
-    bipartite_network_2.addEdge("p2", "c0", 1)
-    bipartite_network_2.addEdge("p3", "c0", 1)
-    bipartite_network_2.addEdge("p3", "c1", 1)
-    bipartite_network_2.addEdge("p4", "c0", 1)
-    bipartite_network_2.addEdge("p5", "c0", 1)
-
-    # Continue adding the remaining edges for the described bipartite matching scenario
-
-    bipartite_network_2.addEdge("c0", "e", 3)
-    bipartite_network_2.addEdge("c1", "e", 3)
-
-    bipartite_network_2.addEdge("e", "sink", 2)
-
-    # Calculating max flow (which will represent the maximum matching)
-    max_matching_2 = bipartite_network_2.calculateMaxFlow()
-    print(max_matching_2)
-    print(bipartite_network_2)
-
+    test_network = FlowNetwork()
+    preferences = [[0], [1], [0, 1], [0, 1], [1, 0], [1], [1, 0], [0, 1], [1]]
+    licenses = [1, 4, 0, 5, 8]
+    test_network.create_bipartite_graph(preferences,licenses)
+    test_network.calculateMaxFlow()
+    print(test_network.getResults())
 

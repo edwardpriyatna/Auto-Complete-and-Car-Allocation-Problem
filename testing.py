@@ -7,7 +7,7 @@
 """
 
 import unittest
-from q2 import allocate
+from  import allocate
 
 # 1: Customized Auto-Complete
 
