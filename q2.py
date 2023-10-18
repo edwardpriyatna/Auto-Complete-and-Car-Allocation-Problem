@@ -161,7 +161,7 @@ class ResidualNetwork:
         return max_flow
 
 if __name__ == '__main__':
-    preferences = [[1], [0, 1], [0], [0, 1], [0], [0]]
+    preferences = [[1], [0, 1], [0], [0,1], [0], [0]]
     licences = [0, 1, 2, 4]
     network=Network()
     network.make_network(preferences,licences)
