@@ -94,7 +94,7 @@ class Network:
             self.add_edge(c_vertex, e_vertex, 3)
 
         # Connect vertex e to sink
-        self.add_edge(e_vertex, sink, 3 * math.ceil(len(preferences) / 5))
+        self.add_edge(e_vertex, sink, len(preferences)-math.ceil(len(preferences) / 5))
 
 class ResidualNetwork:
     def __init__(self, network):
@@ -114,19 +114,52 @@ class ResidualNetwork:
                 result += f"  {e}\n"
         return result
 
-    def BFS(self):
-        q = queue.Queue()
-        q.put(self.vertices[0])
-        pred = []
-        while not q.empty() and pred[self.vertices[1]] is None:
-            cur = q.get()
-            for e in self.vertices[cur].edges:
-                if pred[e.t] is None and e.t is not self.vertices[0] and e.cap > e.flow:
-                    pred[e.t] = e
-                    q.put(e.t)
-        if pred[self.vertices[1]] is not None:
-            return pred
-        return None
+    def bfs(self, source, sink):
+        # Initialize the predecessor of each vertex
+        for v in self.vertices:
+            v.pred = None
+
+        # Create a queue and add the source vertex to it
+        vertex_queue = queue.Queue()
+        vertex_queue.put(source)
+
+        while not vertex_queue.empty() and self.vertices[sink.id].pred is None:
+            # Get the next vertex from the queue
+            current_vertex = vertex_queue.get()
+
+            # Iterate over all edges coming out of 'current_vertex'
+            for edge in self.vertices[current_vertex.id].edges:
+                # If the end vertex of the edge has not been visited yet and the edge can carry more flow
+                if self.vertices[edge.t.id].pred is None and edge.t != source and edge.cap > edge.flow:
+                    # Set the predecessor of the end vertex to be 'edge'
+                    self.vertices[edge.t.id].pred = edge
+
+                    # Add the end vertex of the edge to the queue
+                    vertex_queue.put(edge.t)
+
+        # If we exited the loop without finding a path to the sink, then no augmenting path was found
+        if self.vertices[sink.id].pred is None:
+            return False
+
+        # Otherwise, we found an augmenting path
+        return True
+
+    def edmonds_karp(self, source, sink):
+        max_flow = 0
+        while self.bfs(source, sink):
+            path_flow = float('inf')
+            s = sink
+            while s != source:
+                path_flow = min(path_flow, self.vertices[s.id].pred.cap - self.vertices[s.id].pred.flow)
+                s = self.vertices[s.id].pred.s
+            max_flow += path_flow
+            v = sink
+            while v != source:
+                self.vertices[v.id].pred.flow += path_flow
+                self.vertices[v.id].pred.rev.flow -= path_flow
+                v = self.vertices[v.id].pred.s
+        return max_flow
+
 
 if __name__ == '__main__':
     preferences = [[0], [1], [0, 1], [0, 1], [1, 0], [1], [1, 0], [0, 1], [1]]
@@ -134,6 +167,10 @@ if __name__ == '__main__':
     network=Network()
     network.make_network(preferences,licences)
     residual=ResidualNetwork(network)
+    source=residual.vertices[0]
+    sink=residual.vertices[1]
+    residual.edmonds_karp(source,sink)
     print(residual)
+
 
 
