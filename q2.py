@@ -160,10 +160,9 @@ class ResidualNetwork:
                 v = self.vertices[v.id].pred.s
         return max_flow
 
-
 if __name__ == '__main__':
-    preferences = [[0], [1], [0, 1], [0, 1], [1, 0], [1], [1, 0], [0, 1], [1]]
-    licences = [1, 4, 0, 5, 8]
+    preferences = [[1], [0, 1], [0], [0, 1], [0], [0]]
+    licences = [0, 1, 2, 4]
     network=Network()
     network.make_network(preferences,licences)
     residual=ResidualNetwork(network)
@@ -171,6 +170,5 @@ if __name__ == '__main__':
     sink=residual.vertices[1]
     residual.edmonds_karp(source,sink)
     print(residual)
-
 
 
