@@ -6,11 +6,10 @@ class Vertex:
     def __init__(self,id,name):
         self.id=id
         self.name=name
-        self.edges=[] # a list that stores all the original edge and if in the residual network stores both the original and reverse
-        self.pred=None #a predecessor edge
+        self.edges=[] # a list that stores all the original edge. If in residual network stores both the original and reverse.
 
     def __str__(self):
-        return f"id: {self.id} | name: {self.name} | predecessor: {self.pred}"
+        return f"id: {self.id} | name: {self.name}"
 
 class Edge:
     def __init__(self,s,t,cap): #source, sink, capacity
@@ -31,8 +30,8 @@ class Edge:
 
 class Network:
     def __init__(self):
-        self.vertices = []
-        self.edges=[]
+        self.vertices = [] #stores a list of vertices
+        self.edges=[] #stores a list of edges
 
     def add_vertex(self,id, name):
         vertex = Vertex(id,name)
@@ -91,10 +90,10 @@ class Network:
 
         # Connect c vertices to vertex e with capacity 3
         for c_vertex in c_vertices:
-            self.add_edge(c_vertex, e_vertex, 3)
+            self.add_edge(c_vertex, e_vertex, 1)
 
         # Connect vertex e to sink
-        self.add_edge(e_vertex, sink, len(preferences)-math.ceil(len(preferences) / 5))
+        self.add_edge(e_vertex, sink, 1)
 
 class ResidualNetwork:
     def __init__(self, network):
@@ -144,21 +143,35 @@ class ResidualNetwork:
         # Otherwise, we found an augmenting path
         return True
 
-    def edmonds_karp(self, source, sink):
-        max_flow = 0
-        while self.bfs(source, sink):
-            path_flow = float('inf')
-            s = sink
-            while s != source:
-                path_flow = min(path_flow, self.vertices[s.id].pred.cap - self.vertices[s.id].pred.flow)
-                s = self.vertices[s.id].pred.s
-            max_flow += path_flow
-            v = sink
-            while v != source:
-                self.vertices[v.id].pred.flow += path_flow
-                self.vertices[v.id].pred.rev.flow -= path_flow
-                v = self.vertices[v.id].pred.s
-        return max_flow
+    def edmonds_karp(self):
+        flow=0
+        source=self.vertices[0]
+        sink=self.vertices[1]
+        pred = [None] * len(self.vertices)
+        print(pred)
+        while pred[sink.id] is not None:
+            print('enter loop')
+            q = queue.Queue()
+            q.put(source)
+            while not q.empty() and pred[sink.id] is not None:
+                cur=q.get()
+                for e in cur.edges:
+                    if pred[e.t.id] is None and e.t != source and e.cap > e.flow:
+                        pred[e.t.id] = e
+                        q.put(e.t)
+
+            df = float('inf')
+            e = pred[sink.id]
+            while e is not None:
+                df = min(df, e.cap - e.flow)
+                e = pred[e.s.id]
+            e = pred[sink.id]
+            while e is not None:
+                e.flow = e.flow + df
+                e.rev.flow = e.rev.flow - df
+                e = pred[e.s.id]
+            flow = flow + df
+        return flow
 
 if __name__ == '__main__':
     preferences = [[1], [0, 1], [0], [0,1], [0], [0]]
@@ -166,9 +179,9 @@ if __name__ == '__main__':
     network=Network()
     network.make_network(preferences,licences)
     residual=ResidualNetwork(network)
-    source=residual.vertices[0]
-    sink=residual.vertices[1]
-    residual.edmonds_karp(source,sink)
     print(residual)
+    print(residual.edmonds_karp())
+
+
 
 
