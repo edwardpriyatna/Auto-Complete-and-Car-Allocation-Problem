@@ -185,10 +185,14 @@ class FlowNetwork:
         return results
 
 def allocate(preferences, licenses):
+    if len(preferences)<2 or len(licenses)<math.ceil(len(preferences)/5): #each car need minimum or there are not enough drivers
+        return None
     network = FlowNetwork()
     network.create_bipartite_graph(preferences, licenses)
-    network.calculateMaxFlow()
-    return test_network.getResults()
+    max_flow=network.calculateMaxFlow()
+    if max_flow!=len(preferences):
+        return None
+    return network.getResults()
 
 if __name__ == '__main__':
     test_network = FlowNetwork()
