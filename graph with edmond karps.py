@@ -121,35 +121,51 @@ class FlowNetwork:
 
 if __name__ == '__main__':
     # Setting up the flow network for the described bipartite matching scenario
-    bipartite_network = FlowNetwork()
+    bipartite_network_2 = FlowNetwork()
 
     # Adding vertices
-    bipartite_network.addVertex("source", source=True)
-    bipartite_network.addVertex("sink", sink=True)
-    bipartite_network.addVertex("1")
-    bipartite_network.addVertex("2")
-    bipartite_network.addVertex("3")
-    bipartite_network.addVertex("4")
-    bipartite_network.addVertex("6")
-    bipartite_network.addVertex("7")
+    bipartite_network_2.addVertex("source", source=True)
+    bipartite_network_2.addVertex("sink", sink=True)
+    for i in range(6):
+        bipartite_network_2.addVertex(f"p{i}")
+    bipartite_network_2.addVertex("d0")
+    bipartite_network_2.addVertex("d1")
+    bipartite_network_2.addVertex("c0")
+    bipartite_network_2.addVertex("c1")
+    bipartite_network_2.addVertex("e")
 
     # Adding edges
-    bipartite_network.addEdge("source", "1", 1)
-    bipartite_network.addEdge("source", "2", 1)
-    bipartite_network.addEdge("source", "3", 1)
-    bipartite_network.addEdge("source", "4", 1)
+    for i in range(6):
+        bipartite_network_2.addEdge("source", f"p{i}", 1)
 
-    bipartite_network.addEdge("1", "7", 1)
-    bipartite_network.addEdge("2", "6", 1)
-    bipartite_network.addEdge("2", "7", 1)
-    bipartite_network.addEdge("3", "6", 1)
-    bipartite_network.addEdge("4", "6", 1)
+    bipartite_network_2.addEdge("p0", "d1", 1)
+    bipartite_network_2.addEdge("p1", "d0", 1)
+    bipartite_network_2.addEdge("p1", "d1", 1)
+    bipartite_network_2.addEdge("p2", "d0", 1)
+    bipartite_network_2.addEdge("p4", "d0", 1)
 
-    bipartite_network.addEdge("6", "sink", 2)
-    bipartite_network.addEdge("7", "sink", 2)
+    bipartite_network_2.addEdge("d0", "sink", 2)
+    bipartite_network_2.addEdge("d1", "sink", 2)
+
+    bipartite_network_2.addEdge("p0", "c1", 1)
+    bipartite_network_2.addEdge("p1", "c0", 1)
+    bipartite_network_2.addEdge("p1", "c1", 1)
+    bipartite_network_2.addEdge("p2", "c0", 1)
+    bipartite_network_2.addEdge("p3", "c0", 1)
+    bipartite_network_2.addEdge("p3", "c1", 1)
+    bipartite_network_2.addEdge("p4", "c0", 1)
+    bipartite_network_2.addEdge("p5", "c0", 1)
+
+    # Continue adding the remaining edges for the described bipartite matching scenario
+
+    bipartite_network_2.addEdge("c0", "e", 3)
+    bipartite_network_2.addEdge("c1", "e", 3)
+
+    bipartite_network_2.addEdge("e", "sink", 2)
 
     # Calculating max flow (which will represent the maximum matching)
-    max_matching = bipartite_network.calculateMaxFlow()
-    print(bipartite_network)
+    max_matching_2 = bipartite_network_2.calculateMaxFlow()
+    print(max_matching_2)
+    print(bipartite_network_2)
 
 
