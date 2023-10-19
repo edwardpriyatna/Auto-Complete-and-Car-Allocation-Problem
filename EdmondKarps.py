@@ -1,19 +1,12 @@
 import math
 
 class Vertex:
-    def __init__(self, name, source=False, sink=False):
+    def __init__(self, name):
         self.name = name
-        self.source = source
-        self.sink = sink
-        self.edges = []  # each vertex now has its own edges list
+        self.edges = []
 
     def __str__(self):
-        vertex_type = ""
-        if self.source:
-            vertex_type = "(Source)"
-        elif self.sink:
-            vertex_type = "(Sink)"
-        return f"Vertex {self.name} {vertex_type}"
+        return f"Vertex {self.name}"
 
 class Edge:
     def __init__(self, start, end, capacity):
@@ -21,7 +14,7 @@ class Edge:
         self.end = end
         self.capacity = capacity
         self.flow = 0
-        self.returnEdge = None
+        self.reverseEdge = None
 
     def __str__(self):
         return f"Edge ({self.start} -> {self.end}) | Flow: {self.flow} | Capacity: {self.capacity}"
@@ -35,28 +28,10 @@ class FlowNetwork:
         edges_str = "\n".join(str(edge) for edge in self.getEdges())
         return f"Flow Network:\n\nVertices:\n{vertices_str}\n\nEdges:\n{edges_str}"
 
-    def getSource(self):
-        for vertex in self.vertices:
-            if vertex.source:
-                return vertex
-        return None
-
-    def getSink(self):
-        for vertex in self.vertices:
-            if vertex.sink:
-                return vertex
-        return None
-
     def getVertex(self, name):
         for vertex in self.vertices:
             if name == vertex.name:
                 return vertex
-
-    def vertexInNetwork(self, name):
-        for vertex in self.vertices:
-            if vertex.name == name:
-                return True
-        return False
 
     def getEdges(self):
         allEdges = []
@@ -65,35 +40,21 @@ class FlowNetwork:
                 allEdges.append(edge)
         return allEdges
 
-    def addVertex(self, name, source=False, sink=False):
-        if source and sink:
-            return "Vertex cannot be source and sink"
-        if self.vertexInNetwork(name):
-            return "Duplicate vertex"
-        if source:
-            if self.getSource() != None:
-                return "Source already Exists"
-        if sink:
-            if self.getSink() != None:
-                return "Sink already Exists"
-        newVertex = Vertex(name, source, sink)
+    def addVertex(self, name):
+        newVertex = Vertex(name)
         self.vertices.append(newVertex)
 
     def addEdge(self, start, end, capacity):
-        if start == end:
-            return "Cannot have same start and end"
-        if not self.vertexInNetwork(start):
-            return "Start vertex has not been added yet"
-        if not self.vertexInNetwork(end):
-            return "End vertex has not been added yet"
         newEdge = Edge(start, end, capacity)
-        returnEdge = Edge(end, start, 0)
-        newEdge.returnEdge = returnEdge
-        returnEdge.returnEdge = newEdge
+        reverseEdge = Edge(end, start, 0)
+        newEdge.reverseEdge = reverseEdge
+        reverseEdge.reverseEdge = newEdge
+
         startVertex = self.getVertex(start)
         startVertex.edges.append(newEdge)
+
         endVertex = self.getVertex(end)
-        endVertex.edges.append(returnEdge)
+        endVertex.edges.append(reverseEdge)
 
     def getPath(self, start, end, path):
         if start == end:
@@ -107,24 +68,22 @@ class FlowNetwork:
                     return result
 
     def calculateMaxFlow(self):
-        source = self.getSource()
-        sink = self.getSink()
-        if source == None or sink == None:
-            return "Network does not have source and sink"
+        source = self.vertices[0]
+        sink = self.vertices[1]
         path = self.getPath(source.name, sink.name, [])
         while path != None:
             flow = min(edge[1] for edge in path)
             for edge, res in path:
                 edge.flow += flow
-                edge.returnEdge.flow -= flow
+                edge.reverseEdge.flow -= flow
             path = self.getPath(source.name, sink.name, [])
-        sourceEdges = self.getVertex(source.name).edges
+        sourceEdges = self.vertices[0].edges
         return sum(edge.flow for edge in sourceEdges)
 
     def create_bipartite_graph(self, preferences, licenses):
         # Create source and sink vertices
-        self.addVertex("source", source=True)
-        self.addVertex("sink", sink=True)
+        self.addVertex("source")
+        self.addVertex("sink")
 
         # Create vertices 0,1,...,len(preferences)-1 and connect them to source
         for i in range(len(preferences)):
@@ -163,13 +122,11 @@ class FlowNetwork:
 
     def getResults(self):
         results = []
-
-        num_d_vertices = math.ceil(len(self.vertices) / 5)  # Assuming this based on earlier structure
+        num_d_vertices = math.ceil(len(self.vertices) / 5)
 
         # For each d and c vertex pair, gather the connected number vertices
         for i in range(num_d_vertices):
             combined_list = []
-
             # Check each numbered vertex for connections to d or c vertices
             for v in self.vertices:
                 if v.name.isnumeric():
@@ -178,19 +135,18 @@ class FlowNetwork:
                             combined_list.append(int(v.name))
                         elif edge.flow > 0 and edge.end == f"c{i}":
                             combined_list.append(int(v.name))
-
             if combined_list:  # Only add if there's a valid connection
                 results.append(combined_list)
-
         return results
 
 def allocate(preferences, licenses):
-    if len(preferences)<2 or len(licenses)<math.ceil(len(preferences)/5): #each car need minimum or there are not enough drivers
+    if len(preferences)<2 or len(licenses) < math.ceil(len(preferences)/5):
+        # each car need minimum 2 persons or there are not enough drivers for the amount of people
         return None
     network = FlowNetwork()
     network.create_bipartite_graph(preferences, licenses)
     max_flow=network.calculateMaxFlow()
-    if max_flow!=len(preferences):
+    if max_flow < len(preferences): #this means not every person can be matched with a car that has 2 drivers
         return None
     return network.getResults()
 
