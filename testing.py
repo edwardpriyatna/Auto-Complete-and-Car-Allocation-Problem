@@ -7,363 +7,371 @@
 """
 
 import unittest
-from EdmondKarps import allocate
+import time
+from assignment2 import Trie, allocate
 
 # 1: Customized Auto-Complete
 
 class TestingQ1(unittest.TestCase):
 
+
     def test_01(self):
-        
-        # initialising test
-        prefix = 'a'
-        word, definition, frequency = myTrie.prefix_search(prefix)
-        
-        # testing
-        self.assertEqual(word, 'aberr')
-        self.assertEqual(definition, 'To wander; to stray. [Obs.] Sir T. Browne.')
-        self.assertEqual(frequency, 3000)
-    
-    def test_02(self):
-        
-        # initialising test
-        prefix = 'an'
-        word, definition, frequency = myTrie.prefix_search(prefix)
-        
-        # testing
-        self.assertEqual(word, 'andantino')
-        self.assertEqual(definition, 'Rather quicker than andante; between that allegretto.')
-        self.assertEqual(frequency, 205)
 
-    def test_03(self):
-        
         # initialising test
-        prefix = 'ana'
-        word, definition, frequency = myTrie.prefix_search(prefix)
-        
-        # testing
-        self.assertEqual(word, 'analeptic')
-        self.assertEqual(definition, 'Restorative; giving strength after disease. -- n.')
-        self.assertEqual(frequency, 161)
-
-    def test_04(self):
-        
-        # initialising test
-        prefix = 'anac'
-        word, definition, frequency = myTrie.prefix_search(prefix)
-        
-        # testing
-        self.assertEqual(word, 'anaclastic')
-        self.assertEqual(definition, 'Produced by the refraction of light, as seen through water; as, anaclastic curves.')
-        self.assertEqual(frequency, 24)
-
-    def test_05(self):
-        
-        # initialising test
-        prefix = 'anace'
-        word, definition, frequency = myTrie.prefix_search(prefix)
-        
-        # testing
-        self.assertEqual(word, None)
-        self.assertEqual(definition, None)
-        self.assertEqual(frequency, 0)
-    
-    def test_06(self):
-        
-        # initialising test
+        Dictionary = load_dictionary("Dictionary.txt")
+        myTrie = Trie(Dictionary)
         prefix = ''
         word, definition, frequency = myTrie.prefix_search(prefix)
-        
+
         # testing
-        self.assertEqual(word, 'aberr')
-        self.assertEqual(definition, 'To wander; to stray. [Obs.] Sir T. Browne.')
-        self.assertEqual(frequency, 3000)
+        self.assertEqual(word, 'acpunj')
+        self.assertEqual(definition, 'fpowsspkobdt')
+        self.assertEqual(frequency, 1000000)
+
+    def test_02(self):
+
+        # initialising test
+        Dictionary = load_dictionary("Dictionary.txt")
+        myTrie = Trie(Dictionary)
+        prefix = 'skzv'
+        word, definition, frequency = myTrie.prefix_search(prefix)
+
+        # testing
+        self.assertEqual(word, 'skzv')
+        self.assertEqual(definition, 'kmcfppjgzcmoxrxy')
+        self.assertEqual(frequency, 2)
+
+    def test_03(self):
+
+        # initialising test
+        Dictionary = load_dictionary("Dictionary.txt")
+        myTrie = Trie(Dictionary)
+        prefix = 'evtfq'
+        word, definition, frequency = myTrie.prefix_search(prefix)
+
+        # testing
+        self.assertEqual(word, None)
+        self.assertEqual(definition, None)
+        self.assertEqual(frequency, 0)
+
+    def test_04(self):
+
+        # initialising test
+        prefix = 'siczn'
+        word, definition, frequency = myTrie.prefix_search(prefix)
+
+        # testing
+        self.assertEqual(word, None)
+        self.assertEqual(definition, None)
+        self.assertEqual(frequency, 0)
+
+    def test_05(self):
+
+        # initialising test
+        prefix = 'mvn'
+        word, definition, frequency = myTrie.prefix_search(prefix)
+
+        # testing
+        self.assertEqual(word, 'mvnyglg')
+        self.assertEqual(definition, 'fuavqfalafdeyp')
+        self.assertEqual(frequency, 66)
+
+    def test_06(self):
+
+        # initialising test
+        prefix = 'pyolv'
+        word, definition, frequency = myTrie.prefix_search(prefix)
+
+        # testing
+        self.assertEqual(word, None)
+        self.assertEqual(definition, None)
+        self.assertEqual(frequency, 0)
 
     def test_07(self):
-        
+
         # initialising test
-        prefix = 'ba'
+        prefix = 'u'
         word, definition, frequency = myTrie.prefix_search(prefix)
-        
+
         # testing
-        self.assertEqual(word, None)
-        self.assertEqual(definition, None)
-        self.assertEqual(frequency, 0)
+        self.assertEqual(word, 'uknxzlja')
+        self.assertEqual(definition, 'fykikmlfnflnnpqe')
+        self.assertEqual(frequency, 38574)
 
     def test_08(self):
-        
+
         # initialising test
-        prefix = 'xyz'
+        prefix = 'x'
         word, definition, frequency = myTrie.prefix_search(prefix)
-        
+
         # testing
-        self.assertEqual(word, None)
-        self.assertEqual(definition, None)
-        self.assertEqual(frequency, 0)
+        self.assertEqual(word, 'xfbp')
+        self.assertEqual(definition, 'jfuysrybzebffexh')
+        self.assertEqual(frequency, 38656)
 
     def test_09(self):
-        
+
         # initialising test
-        prefix = 'abu'
+        prefix = 'oh'
         word, definition, frequency = myTrie.prefix_search(prefix)
-        
+
         # testing
-        self.assertEqual(word, 'abutter')
-        self.assertEqual(definition, 'One who, or that which, abuts. Specifically, the owner of a contiguous estate; as, the abutters on a street or a river.')
-        self.assertEqual(frequency, 17)
+        self.assertEqual(word, 'ohewpn')
+        self.assertEqual(definition, 'vwnkqhyjhwdfcgmuhldvlzjj')
+        self.assertEqual(frequency, 1484)
 
     def test_10(self):
-        
+
         # initialising test
-        prefix = 'az'
+        prefix = 'elwm'
         word, definition, frequency = myTrie.prefix_search(prefix)
-        
+
         # testing
-        self.assertEqual(word, None)
-        self.assertEqual(definition, None)
-        self.assertEqual(frequency, 0)
+        self.assertEqual(word, 'elwmeh')
+        self.assertEqual(definition, 'pdbvzdeyyhapxvbsqgbixast')
+        self.assertEqual(frequency, 2)
 
     def test_11(self):
-        
+
         # initialising test
-        prefix = 'absurd'
+        prefix = 'rgn'
         word, definition, frequency = myTrie.prefix_search(prefix)
-        
+
         # testing
-        self.assertEqual(word, 'absurdly')
-        self.assertEqual(definition, 'In an absurd manner.')
-        self.assertEqual(frequency, 3)
-    
+        self.assertEqual(word, 'rgnc')
+        self.assertEqual(definition, 'pdekrtvfvuctckfh')
+        self.assertEqual(frequency, 52)
+
     def test_12(self):
-        
+
         # initialising test
-        prefix = 'aware'
+        prefix = 'wgdfs'
         word, definition, frequency = myTrie.prefix_search(prefix)
-        
+
         # testing
         self.assertEqual(word, None)
         self.assertEqual(definition, None)
         self.assertEqual(frequency, 0)
 
     def test_13(self):
-        
+
         # initialising test
-        prefix = 'aco'
+        prefix = 'jmerc'
         word, definition, frequency = myTrie.prefix_search(prefix)
-        
+
         # testing
-        self.assertEqual(word, 'aconite')
-        self.assertEqual(definition, 'The herb wolfsbane, or monkshood; -- applied to any plant of the genus Aconitum (tribe Hellebore), all the species of which are poisonous.')
-        self.assertEqual(frequency, 32)
+        self.assertEqual(word, None)
+        self.assertEqual(definition, None)
+        self.assertEqual(frequency, 0)
 
     def test_14(self):
-        
+
         # initialising test
-        prefix = 'acol'
+        prefix = 'e'
         word, definition, frequency = myTrie.prefix_search(prefix)
-        
+
         # testing
-        self.assertEqual(word, 'acold')
-        self.assertEqual(definition, 'Cold. [Obs.] "Poor Tom\'s acold." Shak.')
-        self.assertEqual(frequency, 8)
+        self.assertEqual(word, 'ealmuzc')
+        self.assertEqual(definition, 'mwtxdhvjmvpoud')
+        self.assertEqual(frequency, 38672)
 
     def test_15(self):
-        
+
         # initialising test
-        prefix = 'abg'
+        prefix = 'tayed'
         word, definition, frequency = myTrie.prefix_search(prefix)
-        
+
         # testing
-        self.assertEqual(word, 'abgeordnetenhaus')
-        self.assertEqual(definition, 'See Legislature, Austria, Prussia.')
-        self.assertEqual(frequency, 1)
+        self.assertEqual(word, None)
+        self.assertEqual(definition, None)
+        self.assertEqual(frequency, 0)
 
     def test_16(self):
-        
+
         # initialising test
-        prefix = 'asd'
+        prefix = 'iv'
         word, definition, frequency = myTrie.prefix_search(prefix)
-        
+
         # testing
-        self.assertEqual(word, None)
-        self.assertEqual(definition, None)
-        self.assertEqual(frequency, 0)
+        self.assertEqual(word, 'ivsmrfjj')
+        self.assertEqual(definition, 'hhnfuskbjjoxoljrqeubfnbxljvbdqfk')
+        self.assertEqual(frequency, 1460)
 
     def test_17(self):
-        
+
         # initialising test
-        prefix = 'ay'
+        prefix = 'sfn'
         word, definition, frequency = myTrie.prefix_search(prefix)
-        
+
         # testing
-        self.assertEqual(word, None)
-        self.assertEqual(definition, None)
-        self.assertEqual(frequency, 0)
+        self.assertEqual(word, 'sfnss')
+        self.assertEqual(definition, 'epdgufbswwtzbpz')
+        self.assertEqual(frequency, 65)
 
     def test_18(self):
-        
+
         # initialising test
-        prefix = 'ae'
+        prefix = 'tuye'
         word, definition, frequency = myTrie.prefix_search(prefix)
-        
+
         # testing
-        self.assertEqual(word, 'aerometric')
-        self.assertEqual(definition, 'Of or pertaining to aërometry; as, aërometric investigations.')
-        self.assertEqual(frequency, 97)
+        self.assertEqual(word, 'tuyejkk')
+        self.assertEqual(definition, 'hkagrwbvedswjascfkmqr')
+        self.assertEqual(frequency, 3)
 
     def test_19(self):
-        
+
         # initialising test
-        prefix = 'and'
+        prefix = 'qby'
         word, definition, frequency = myTrie.prefix_search(prefix)
-        
+
         # testing
-        self.assertEqual(word, 'andantino')
-        self.assertEqual(definition, 'Rather quicker than andante; between that allegretto.')
-        self.assertEqual(frequency, 10)
+        self.assertEqual(word, 'qbywh')
+        self.assertEqual(definition, 'ewbexpvvwg')
+        self.assertEqual(frequency, 66)
 
     def test_20(self):
-        
+
         # initialising test
-        prefix = 'ado'
+        prefix = 'f'
         word, definition, frequency = myTrie.prefix_search(prefix)
-        
+
         # testing
-        self.assertEqual(word, 'adorner')
-        self.assertEqual(definition, 'He who, or that which, adorns; a beautifier.')
-        self.assertEqual(frequency, 30)
+        self.assertEqual(word, 'fakescgq')
+        self.assertEqual(definition, 'dbsvngmcbkxhualaisewbzdv')
+        self.assertEqual(frequency, 38595)
 
     def test_21(self):
-        
+
         # initialising test
-        prefix = 'testverylongword'
+        prefix = 'i'
         word, definition, frequency = myTrie.prefix_search(prefix)
-        
+
         # testing
-        self.assertEqual(word, None)
-        self.assertEqual(definition, None)
-        self.assertEqual(frequency, 0)
-    
+        self.assertEqual(word, 'ibpqgpwu')
+        self.assertEqual(definition, 'aebkglnpsnywzdmilqpsaogy')
+        self.assertEqual(frequency, 38478)
+
     def test_22(self):
-        
+
         # initialising test
-        prefix = 'aja'
+        prefix = 'jj'
         word, definition, frequency = myTrie.prefix_search(prefix)
-        
+
         # testing
-        self.assertEqual(word, 'ajava')
-        self.assertEqual(definition, 'See Ajouan.')
-        self.assertEqual(frequency, 2)
+        self.assertEqual(word, 'jjlkd')
+        self.assertEqual(definition, 'ckyilzcccz')
+        self.assertEqual(frequency, 1541)
 
     def test_23(self):
-        
+
         # initialising test
-        prefix = 'ajav'
+        prefix = 'asp'
         word, definition, frequency = myTrie.prefix_search(prefix)
-        
+
         # testing
-        self.assertEqual(word, 'ajava')
-        self.assertEqual(definition, 'See Ajouan.')
-        self.assertEqual(frequency, 1)
+        self.assertEqual(word, 'aspy')
+        self.assertEqual(definition, 'usjdbkbx')
+        self.assertEqual(frequency, 53)
 
     def test_24(self):
-        
+
         # initialising test
-        prefix = 'ammon'
+        prefix = 'osrq'
         word, definition, frequency = myTrie.prefix_search(prefix)
-        
+
         # testing
-        self.assertEqual(word, 'ammonitiferous')
-        self.assertEqual(definition, 'Containing fossil ammonites.')
-        self.assertEqual(frequency, 8)
+        self.assertEqual(word, 'osrqqy')
+        self.assertEqual(definition, 'mwxatpeagyoe')
+        self.assertEqual(frequency, 1)
 
     def test_25(self):
-        
+
         # initialising test
-        prefix = 'amm'
+        prefix = 'dh'
         word, definition, frequency = myTrie.prefix_search(prefix)
-        
+
         # testing
-        self.assertEqual(word, 'ammonitiferous')
-        self.assertEqual(definition, 'Containing fossil ammonites.')
-        self.assertEqual(frequency, 13)
+        self.assertEqual(word, 'dhgor')
+        self.assertEqual(definition, 'xpkzsljayzeacocfbglg')
+        self.assertEqual(frequency, 1477)
 
     def test_26(self):
-        
+
         # initialising test
-        prefix = 'amba'
+        prefix = 'w'
         word, definition, frequency = myTrie.prefix_search(prefix)
-        
+
         # testing
-        self.assertEqual(word, 'ambagitory')
-        self.assertEqual(definition, 'Ambagious. [R.]')
-        self.assertEqual(frequency, 9)
+        self.assertEqual(word, 'wcwnxu')
+        self.assertEqual(definition, 'mgajueygfromzfpwfqnesdgv')
+        self.assertEqual(frequency, 38373)
 
     def test_27(self):
-        
-        # initialising test
-        prefix = 'ac'
-        word, definition, frequency = myTrie.prefix_search(prefix)
-        
-        # testing
-        self.assertEqual(word, 'acerbitude')
-        self.assertEqual(definition, 'Sourness and harshness. [Obs.] Bailey.')
-        self.assertEqual(frequency, 545)
 
-    def test_28(self):
-        
         # initialising test
-        prefix = 'ab'
+        prefix = 'nqxgq'
         word, definition, frequency = myTrie.prefix_search(prefix)
-        
-        # testing
-        self.assertEqual(word, 'aberr')
-        self.assertEqual(definition, 'To wander; to stray. [Obs.] Sir T. Browne.')
-        self.assertEqual(frequency, 380)
 
-    def test_29(self):
-        
-        # initialising test
-        prefix = 'ag'
-        word, definition, frequency = myTrie.prefix_search(prefix)
-        
-        # testing
-        self.assertEqual(word, 'agileness')
-        self.assertEqual(definition, 'Agility; nimbleness. [R.]')
-        self.assertEqual(frequency, 170)
-
-    def test_30(self):
-        
-        # initialising test
-        prefix = 'af'
-        word, definition, frequency = myTrie.prefix_search(prefix)
-        
-        # testing
-        self.assertEqual(word, 'aftward')
-        self.assertEqual(definition, 'Toward the stern.')
-        self.assertEqual(frequency, 160)
-
-    def test_31(self):
-        
-        # initialising test
-        prefix = 'afte'
-        word, definition, frequency = myTrie.prefix_search(prefix)
-        
-        # testing
-        self.assertEqual(word, 'aftergame')
-        self.assertEqual(definition, 'A second game; hence, a subsequent scheme or expedient. Wotton. Aftergame at Irish, an ancient game very nearly resembling backgammon. Beau. & Fl.')
-        self.assertEqual(frequency, 21)
-
-    def test_32(self):
-        
-        # initialising test
-        prefix = 'restorative'
-        word, definition, frequency = myTrie.prefix_search(prefix)
-        
         # testing
         self.assertEqual(word, None)
         self.assertEqual(definition, None)
         self.assertEqual(frequency, 0)
+
+    def test_28(self):
+
+        # initialising test
+        prefix = 'ukism'
+        word, definition, frequency = myTrie.prefix_search(prefix)
+
+        # testing
+        self.assertEqual(word, None)
+        self.assertEqual(definition, None)
+        self.assertEqual(frequency, 0)
+
+    def test_29(self):
+
+        # initialising test
+        prefix = 'gp'
+        word, definition, frequency = myTrie.prefix_search(prefix)
+
+        # testing
+        self.assertEqual(word, 'gpudjfva')
+        self.assertEqual(definition, 'zonqyqrizwvltxoblcxudnfacrpwxulq')
+        self.assertEqual(frequency, 1553)
+
+    def test_30(self):
+
+        # initialising test
+        prefix = 'whm'
+        word, definition, frequency = myTrie.prefix_search(prefix)
+
+        # testing
+        self.assertEqual(word, 'whmkejl')
+        self.assertEqual(definition, 'ahhvzmqfwhkopieqrpeko')
+        self.assertEqual(frequency, 64)
+
+    def test_31(self):
+
+        # initialising test
+        prefix = 'sbm'
+        word, definition, frequency = myTrie.prefix_search(prefix)
+
+        # testing
+        self.assertEqual(word, 'sbmqtiyz')
+        self.assertEqual(definition, 'zbgalfixhaovaqxg')
+        self.assertEqual(frequency, 52)
+
+    def test_32(self):
+
+        # initialising test
+        prefix = 'b'
+        word, definition, frequency = myTrie.prefix_search(prefix)
+
+        # testing
+        self.assertEqual(word, 'bhon')
+        self.assertEqual(definition, 'oizztdgiohcn')
+        self.assertEqual(frequency, 38616)
 
 
 # 2: A Weekend Getaway
@@ -817,7 +825,12 @@ def find_chosen_output(cars, expected):
 # Run Tests
 
 if __name__ == '__main__':
+    timer = time.time()
     Dictionary = load_dictionary("Dictionary.txt")
+    print(f"\nDictionary Load Time: {round(time.time() - timer, 3)}s")
+    timer = time.time()
     myTrie = Trie(Dictionary)
+    print(f"Trie Construction Time: {round(time.time() - timer, 3)}s\n")
+    time.sleep(2)
     unittest.main()
     
