@@ -524,3 +524,16 @@ def allocate(preferences, licenses):
         return None
     return network.getResults()
 
+if __name__ == '__main__':
+    # Dictionary = load_dictionary("Dictionary.txt")
+    # myTrie = Trie(Dictionary)
+    # print(myTrie.prefix_search(""))
+    # print(myTrie.prefix_search("a"))
+    # print(myTrie.prefix_search("an"))
+    # print(myTrie.prefix_search("ana"))
+    # print(myTrie.prefix_search("anac"))
+    # print(myTrie.prefix_search("anace"))
+    preferences = [[0], [1], [0,1], [0, 1], [1, 0], [1], [1, 0], [0, 1], [1]]
+    licences = [1, 4, 0, 5, 8]
+    print(allocate(preferences, licences))
+
