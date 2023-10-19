@@ -255,8 +255,8 @@ class Edge:
         Initializes an Edge object to be used in FlowNetwork class.
 
         :Input:
-        origin: The starting vertex.
-        destination: The ending vertex.
+        origin: The origin vertex.
+        destination: The destination vertex.
         capacity: The capacity.
         :Output, return or postcondition: Creates a vertex object with the attributes being origin, destination,
         capacity, flow, and reverseEdge.
@@ -334,8 +334,8 @@ class FlowNetwork:
         Adds a new edge to the origin vertex and the corresponding reverse edge to the destination vertex.
 
         :Input:
-        origin: The vertex the edge starts.
-        destination: The vertex the edge ends.
+        origin: The vertex the edge originates from.
+        destination: The edge destination vertex.
         capacity: The capacity of the edge.
         :Output, return or postcondition: Adds an edge to the origin vertex.
         :Time complexity: O(1). We are creating and appending the edge to the originVertex.edges then we create the
@@ -353,14 +353,14 @@ class FlowNetwork:
         destinationVertex = self.getVertex(destination)
         destinationVertex.edges.append(reverseEdge)
 
-    def getPath(self, start, end, path):
+    def getPath(self, origin, destination, path):
         """
         Function description:
         Recursively determines an augmenting path in the network using DFS.
 
         :Input:
-        start: The starting vertex name.
-        end: The ending vertex name.
+        origin: The origin vertex name.
+        destination: The destination vertex name.
         path: The current path (list of edges) being explored.
 
         :Output, return or postcondition:
@@ -370,13 +370,13 @@ class FlowNetwork:
         :Aux space complexity: O(V + E). It primarily comes from the recursion stack and the path list that stores the
         current path.
         """
-        if start == end:
+        if origin == destination:
             return path
-        startVertex = self.getVertex(start)
-        for edge in startVertex.edges:
+        originVertex = self.getVertex(origin)
+        for edge in originVertex.edges:
             residualCapacity = edge.capacity - edge.flow
             if residualCapacity > 0 and not (edge, residualCapacity) in path:
-                result = self.getPath(edge.end, end, path + [(edge, residualCapacity)])
+                result = self.getPath(edge.destination, destination, path + [(edge, residualCapacity)])
                 if result != None:
                     return result
 
@@ -482,9 +482,9 @@ class FlowNetwork:
             for v in self.vertices:
                 if v.name.isnumeric():
                     for edge in v.edges:
-                        if edge.flow > 0 and edge.end == f"d{i}":
+                        if edge.flow > 0 and edge.destination == f"d{i}":
                             combined_list.append(int(v.name))
-                        elif edge.flow > 0 and edge.end == f"c{i}":
+                        elif edge.flow > 0 and edge.destination == f"c{i}":
                             combined_list.append(int(v.name))
             if combined_list:  # Only add if there's a valid connection
                 results.append(combined_list)

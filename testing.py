@@ -57,6 +57,8 @@ class TestingQ1(unittest.TestCase):
     def test_04(self):
 
         # initialising test
+        Dictionary = load_dictionary("Dictionary.txt")
+        myTrie = Trie(Dictionary)
         prefix = 'siczn'
         word, definition, frequency = myTrie.prefix_search(prefix)
 
@@ -68,6 +70,8 @@ class TestingQ1(unittest.TestCase):
     def test_05(self):
 
         # initialising test
+        Dictionary = load_dictionary("Dictionary.txt")
+        myTrie = Trie(Dictionary)
         prefix = 'mvn'
         word, definition, frequency = myTrie.prefix_search(prefix)
 
@@ -79,6 +83,8 @@ class TestingQ1(unittest.TestCase):
     def test_06(self):
 
         # initialising test
+        Dictionary = load_dictionary("Dictionary.txt")
+        myTrie = Trie(Dictionary)
         prefix = 'pyolv'
         word, definition, frequency = myTrie.prefix_search(prefix)
 
@@ -90,6 +96,8 @@ class TestingQ1(unittest.TestCase):
     def test_07(self):
 
         # initialising test
+        Dictionary = load_dictionary("Dictionary.txt")
+        myTrie = Trie(Dictionary)
         prefix = 'u'
         word, definition, frequency = myTrie.prefix_search(prefix)
 
@@ -101,6 +109,8 @@ class TestingQ1(unittest.TestCase):
     def test_08(self):
 
         # initialising test
+        Dictionary = load_dictionary("Dictionary.txt")
+        myTrie = Trie(Dictionary)
         prefix = 'x'
         word, definition, frequency = myTrie.prefix_search(prefix)
 
@@ -112,6 +122,8 @@ class TestingQ1(unittest.TestCase):
     def test_09(self):
 
         # initialising test
+        Dictionary = load_dictionary("Dictionary.txt")
+        myTrie = Trie(Dictionary)
         prefix = 'oh'
         word, definition, frequency = myTrie.prefix_search(prefix)
 
@@ -123,6 +135,8 @@ class TestingQ1(unittest.TestCase):
     def test_10(self):
 
         # initialising test
+        Dictionary = load_dictionary("Dictionary.txt")
+        myTrie = Trie(Dictionary)
         prefix = 'elwm'
         word, definition, frequency = myTrie.prefix_search(prefix)
 
@@ -134,6 +148,8 @@ class TestingQ1(unittest.TestCase):
     def test_11(self):
 
         # initialising test
+        Dictionary = load_dictionary("Dictionary.txt")
+        myTrie = Trie(Dictionary)
         prefix = 'rgn'
         word, definition, frequency = myTrie.prefix_search(prefix)
 
@@ -145,6 +161,8 @@ class TestingQ1(unittest.TestCase):
     def test_12(self):
 
         # initialising test
+        Dictionary = load_dictionary("Dictionary.txt")
+        myTrie = Trie(Dictionary)
         prefix = 'wgdfs'
         word, definition, frequency = myTrie.prefix_search(prefix)
 
@@ -156,6 +174,8 @@ class TestingQ1(unittest.TestCase):
     def test_13(self):
 
         # initialising test
+        Dictionary = load_dictionary("Dictionary.txt")
+        myTrie = Trie(Dictionary)
         prefix = 'jmerc'
         word, definition, frequency = myTrie.prefix_search(prefix)
 
@@ -167,6 +187,8 @@ class TestingQ1(unittest.TestCase):
     def test_14(self):
 
         # initialising test
+        Dictionary = load_dictionary("Dictionary.txt")
+        myTrie = Trie(Dictionary)
         prefix = 'e'
         word, definition, frequency = myTrie.prefix_search(prefix)
 
@@ -178,6 +200,8 @@ class TestingQ1(unittest.TestCase):
     def test_15(self):
 
         # initialising test
+        Dictionary = load_dictionary("Dictionary.txt")
+        myTrie = Trie(Dictionary)
         prefix = 'tayed'
         word, definition, frequency = myTrie.prefix_search(prefix)
 
@@ -189,6 +213,8 @@ class TestingQ1(unittest.TestCase):
     def test_16(self):
 
         # initialising test
+        Dictionary = load_dictionary("Dictionary.txt")
+        myTrie = Trie(Dictionary)
         prefix = 'iv'
         word, definition, frequency = myTrie.prefix_search(prefix)
 
@@ -200,6 +226,8 @@ class TestingQ1(unittest.TestCase):
     def test_17(self):
 
         # initialising test
+        Dictionary = load_dictionary("Dictionary.txt")
+        myTrie = Trie(Dictionary)
         prefix = 'sfn'
         word, definition, frequency = myTrie.prefix_search(prefix)
 
@@ -211,6 +239,8 @@ class TestingQ1(unittest.TestCase):
     def test_18(self):
 
         # initialising test
+        Dictionary = load_dictionary("Dictionary.txt")
+        myTrie = Trie(Dictionary)
         prefix = 'tuye'
         word, definition, frequency = myTrie.prefix_search(prefix)
 
@@ -222,6 +252,8 @@ class TestingQ1(unittest.TestCase):
     def test_19(self):
 
         # initialising test
+        Dictionary = load_dictionary("Dictionary.txt")
+        myTrie = Trie(Dictionary)
         prefix = 'qby'
         word, definition, frequency = myTrie.prefix_search(prefix)
 
@@ -233,6 +265,8 @@ class TestingQ1(unittest.TestCase):
     def test_20(self):
 
         # initialising test
+        Dictionary = load_dictionary("Dictionary.txt")
+        myTrie = Trie(Dictionary)
         prefix = 'f'
         word, definition, frequency = myTrie.prefix_search(prefix)
 
@@ -244,6 +278,8 @@ class TestingQ1(unittest.TestCase):
     def test_21(self):
 
         # initialising test
+        Dictionary = load_dictionary("Dictionary.txt")
+        myTrie = Trie(Dictionary)
         prefix = 'i'
         word, definition, frequency = myTrie.prefix_search(prefix)
 
@@ -255,6 +291,8 @@ class TestingQ1(unittest.TestCase):
     def test_22(self):
 
         # initialising test
+        Dictionary = load_dictionary("Dictionary.txt")
+        myTrie = Trie(Dictionary)
         prefix = 'jj'
         word, definition, frequency = myTrie.prefix_search(prefix)
 
@@ -266,6 +304,8 @@ class TestingQ1(unittest.TestCase):
     def test_23(self):
 
         # initialising test
+        Dictionary = load_dictionary("Dictionary.txt")
+        myTrie = Trie(Dictionary)
         prefix = 'asp'
         word, definition, frequency = myTrie.prefix_search(prefix)
 
@@ -277,6 +317,8 @@ class TestingQ1(unittest.TestCase):
     def test_24(self):
 
         # initialising test
+        Dictionary = load_dictionary("Dictionary.txt")
+        myTrie = Trie(Dictionary)
         prefix = 'osrq'
         word, definition, frequency = myTrie.prefix_search(prefix)
 
@@ -288,6 +330,8 @@ class TestingQ1(unittest.TestCase):
     def test_25(self):
 
         # initialising test
+        Dictionary = load_dictionary("Dictionary.txt")
+        myTrie = Trie(Dictionary)
         prefix = 'dh'
         word, definition, frequency = myTrie.prefix_search(prefix)
 
@@ -299,6 +343,8 @@ class TestingQ1(unittest.TestCase):
     def test_26(self):
 
         # initialising test
+        Dictionary = load_dictionary("Dictionary.txt")
+        myTrie = Trie(Dictionary)
         prefix = 'w'
         word, definition, frequency = myTrie.prefix_search(prefix)
 
@@ -310,6 +356,8 @@ class TestingQ1(unittest.TestCase):
     def test_27(self):
 
         # initialising test
+        Dictionary = load_dictionary("Dictionary.txt")
+        myTrie = Trie(Dictionary)
         prefix = 'nqxgq'
         word, definition, frequency = myTrie.prefix_search(prefix)
 
@@ -321,6 +369,8 @@ class TestingQ1(unittest.TestCase):
     def test_28(self):
 
         # initialising test
+        Dictionary = load_dictionary("Dictionary.txt")
+        myTrie = Trie(Dictionary)
         prefix = 'ukism'
         word, definition, frequency = myTrie.prefix_search(prefix)
 
@@ -332,6 +382,8 @@ class TestingQ1(unittest.TestCase):
     def test_29(self):
 
         # initialising test
+        Dictionary = load_dictionary("Dictionary.txt")
+        myTrie = Trie(Dictionary)
         prefix = 'gp'
         word, definition, frequency = myTrie.prefix_search(prefix)
 
@@ -343,6 +395,8 @@ class TestingQ1(unittest.TestCase):
     def test_30(self):
 
         # initialising test
+        Dictionary = load_dictionary("Dictionary.txt")
+        myTrie = Trie(Dictionary)
         prefix = 'whm'
         word, definition, frequency = myTrie.prefix_search(prefix)
 
@@ -354,6 +408,8 @@ class TestingQ1(unittest.TestCase):
     def test_31(self):
 
         # initialising test
+        Dictionary = load_dictionary("Dictionary.txt")
+        myTrie = Trie(Dictionary)
         prefix = 'sbm'
         word, definition, frequency = myTrie.prefix_search(prefix)
 
@@ -365,6 +421,8 @@ class TestingQ1(unittest.TestCase):
     def test_32(self):
 
         # initialising test
+        Dictionary = load_dictionary("Dictionary.txt")
+        myTrie = Trie(Dictionary)
         prefix = 'b'
         word, definition, frequency = myTrie.prefix_search(prefix)
 
