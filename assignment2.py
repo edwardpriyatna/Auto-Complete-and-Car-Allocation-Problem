@@ -356,7 +356,7 @@ class FlowNetwork:
     def getPath(self, origin, destination, path):
         """
         Function description:
-        Recursively determines an augmenting path in the network using DFS.
+        Recursively determines an augmenting path in the network using BFS.
 
         :Input:
         origin: The origin vertex name.
@@ -390,7 +390,7 @@ class FlowNetwork:
         Returns the maximum flow value in the network.
 
         :Time complexity: O(VE^2). The Ford-Fulkerson algorithm's worst-case time complexity is O(VE^2)
-        when using DFS to find augmenting paths.
+        when using BFS to find augmenting paths.
         :Aux space complexity: O(V + E). Storage for vertices and edges.
         """
         source = self.vertices[0]
@@ -523,18 +523,4 @@ def allocate(preferences, licenses):
     if max_flow < len(preferences): #this means not every person can be matched with a car that has 2 drivers
         return None
     return network.getResults()
-
-
-if __name__ == '__main__':
-    # Dictionary = load_dictionary("Dictionary.txt")
-    # myTrie = Trie(Dictionary)
-    # print(myTrie.prefix_search(""))
-    # print(myTrie.prefix_search("a"))
-    # print(myTrie.prefix_search("an"))
-    # print(myTrie.prefix_search("ana"))
-    # print(myTrie.prefix_search("anac"))
-    # print(myTrie.prefix_search("anace"))
-    preferences = [[0], [1], [0,1], [0, 1], [1, 0], [1], [1, 0], [0, 1], [1]]
-    licences = [1, 4, 0, 5, 8]
-    print(allocate(preferences, licences))
 
