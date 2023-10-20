@@ -40,7 +40,7 @@ class Node:
         self.definition = data[1]
         self.frequency = data[2]
         self.node_frequency = 0
-        # Create an array of child nodes
+        # Array of child nodes
         self.link = [None] * size
 
 class Trie:
@@ -51,18 +51,18 @@ class Trie:
 
         :Input:
         Dictionary: A list of lists, where each for each inner index 0 is the word, index 1 is the definition, and
-        index 2 is the frquency of that word.
+        index 2 is the frequency of that word.
         :Output, return or postcondition: Initializes a Trie with a root node and populates it with data from the
         Dictionary.
         :Time complexity:
         O(T). T is the amount of characters in Dictionary.txt. Creates a Node for every character by inserting every
         word in Dictionary.txt.
         :Aux space complexity:
-        O(T). T is the amount of characters in Dictionary.txt.Creates a Node for every character by inserting every
+        O(T). T is the amount of characters in Dictionary.txt. Creates a Node for every character by inserting every
         word in Dictionary.txt.
         """
         self.root = Node()
-        # Insert each word from the dictionary into the Trie
+        # Inserts each word from dictionary into Trie
         for words in Dictionary:
             self.insert(words[0], words)
 
@@ -73,7 +73,7 @@ class Trie:
 
         Approach description (if main function):
         The insert method adds a word and its data to Trie object. Starting at root node, it adds the node_frequency
-        by 1 and uses compare method in Trie class to store the data. Then, it calls insert_aux method and iterate
+        by 1 and uses compare method in Trie class to store the data. It then calls insert_aux method and iterate
         through the characters of the word that is inserted.
 
         :Input:
@@ -81,7 +81,7 @@ class Trie:
         data: A list containing word information: word, definition, frequency.
         :Output, return or postcondition: Inserts the word and data into the Trie.
         :Time complexity: O(M*min(X, Y)), where M*min(X, Y) is the time complexity of insert_aux function.
-        :Aux space complexity: O(M), where M is the aux space complexity of insert_aux function.
+        :Aux space complexity: O(M). M is the aux space complexity of insert_aux function.
         """
         current = self.root
         # Increment the node frequency at the root node
@@ -100,7 +100,7 @@ class Trie:
         it calculates the index for the corresponding child node based on the character's position in the alphabet.
         If a child node at the calculated index exists, it goes to that node. Else, it creates a new node at that index.
         The method adds the node_frequency at each node along the path, making sure it is the same the number of words
-        sharing that prefix. Then it calls the compare method to update the word information at each node with the
+        sharing that key. It then calls the compare method to update the word information at each node with the
         highest frequency and alphabetically smaller word. When the end of the word is reached, the word and data are
         stored in the 0th child node.
 
@@ -132,11 +132,11 @@ class Trie:
                 current.link[index] = Node()
                 # Move to the newly created child node
                 current = current.link[index]
-            # Increment the node_frequency to reflect the number of words sharing the prefix
+            # Increment the node_frequency to reflect the number of words sharing the key
             current.node_frequency += 1
             # Call the compare method to update word information
             self.compare(current, data, counter)
-            # Recursively insert the word
+            # Recursively inserts the word
             self.insert_aux(current, key, counter + 1, data)
 
     def compare(self, current, data, counter=0):
@@ -144,7 +144,7 @@ class Trie:
         Function description:
         Compares the frequency of a newly inserted word with the frequency of the word already stored at a node and
         updates the node with the word in data if data and current.frequency is not None and the word in data has a
-        higher frequency. If both have the same frequency, it will compare the words alphabetically to determine which
+        higher frequency. If both have the same frequency, it compares the words alphabetically to determine which
         is the smaller that will be stored. It does this by increasing the index each time until the characters are
         different.
 
@@ -173,29 +173,30 @@ class Trie:
             # Set the current node's data to the data if data or current.frequency is None
             current.word, current.definition, current.frequency = data
 
-    def prefix_search(self, key):
+    def prefix_search(self, prefix):
         """
         Function description:
-        Performs a prefix search in the Trie.
+        Returns the word with the highest frequency that has the given prefix, its definition, and the number of words
+        that have the given prefix.
 
         Approach description (if main function):
         This method searches a word and its associated data by its prefix in the Trie data structure.
         Starting at root node, it calls prefix_search_aux to perform to search recursively.
 
         :Input:
-        key: The prefix to search for.
+        prefix: The prefix to search for.
         :Output, return or postcondition: Returns a list containing word, definition, and node_frequency for the
         matching prefix.
-        :Time complexity: O(M), where M is the time complexity of prefix_search_aux method.
+        :Time complexity: O(M). M is the time complexity of prefix_search_aux method.
         :Aux space complexity: O(1)
         """
         current = self.root
-        return self.prefix_search_aux(current, key, 0)
+        return self.prefix_search_aux(current, prefix, 0)
 
-    def prefix_search_aux(self, current, key, counter):
+    def prefix_search_aux(self, current, prefix, counter):
         """
         Function description:
-        Auxiliary function for performing a prefix search in the Trie.
+        Auxiliary function for prefix_search.
 
         Approach description (if main function):
         This method performs a prefix search recursively within the Trie. For each character in the prefix, it goes
@@ -206,19 +207,19 @@ class Trie:
 
         :Input:
         current: The current node in the Trie.
-        key: The prefix to search for.
+        prefix: The prefix to search for.
         counter: The index of the prefix being processed.
         :Output, return or postcondition: Returns a list containing word, definition, and node_frequency for the
         matching prefix.
-        :Time complexity: O(M), where M is the length of the prefix entered by the user and the function is called M
+        :Time complexity: O(M). M is the length of the prefix entered by the user and the function is called M
         times recursively to search each character of the prefix.
         :Aux space complexity: O(1)
         """
         # Return the information of the current node if the end of prefix is reached
-        if counter == len(key):
+        if counter == len(prefix):
             return [current.word, current.definition, current.node_frequency]
         else:
-            char = key[counter]
+            char = prefix[counter]
             index = ord(char) - ord("a") + 1
             # Move to the next character's node if it exists
             if current.link[index] is not None:
@@ -227,7 +228,7 @@ class Trie:
             else:
                 return [None, None, 0]
             # Continue the search recursively
-            return self.prefix_search_aux(current, key, counter + 1)
+            return self.prefix_search_aux(current, prefix, counter + 1)
 
 
 class Vertex:
@@ -356,7 +357,7 @@ class FlowNetwork:
     def getPath(self, origin, destination, path):
         """
         Function description:
-        Recursively determines an augmenting path in the network using BFS.
+        Recursively determines an augmenting path in the network using DFS.
 
         :Input:
         origin: The origin vertex name.
@@ -366,7 +367,8 @@ class FlowNetwork:
         :Output, return or postcondition:
         Returns an augmenting path from the source to the sink if one exists, else None.
 
-        :Time complexity: O(V + E). In worst case, it would visit all the vertices and edges of the flow network.
+        :Time complexity: O(V + E). V being number of vertices. E being number of edges. In worst case, it would visit
+        all the vertices and edges of the flow network.
         :Aux space complexity: O(V + E). It primarily comes from the recursion stack and the path list that stores the
         current path.
         """
@@ -383,15 +385,15 @@ class FlowNetwork:
     def calculateMaxFlow(self):
         """
         Function description:
-        Calculates the maximum flow in the network using Ford-Fulkerson method.
+        Calculates the maximum flow in the network and fill the edges with flow using Ford-Fulkerson method with DFS.
 
         :Input: None
         :Output, return or postcondition:
         Returns the maximum flow value in the network.
 
-        :Time complexity: O(VE^2). The Ford-Fulkerson algorithm's worst-case time complexity is O(VE^2)
-        when using BFS to find augmenting paths.
-        :Aux space complexity: O(V + E). Storage for vertices and edges.
+        :Time complexity: O(VE^2). V being number of vertices. E being number of edges. The Ford-Fulkerson algorithm's
+        worst-case time complexity is O(VE^2) when using DFS to find augmenting paths.
+        :Aux space complexity: O(V). Mainly governed by getPath and storage needed to store the path.
         """
         source = self.vertices[0]
         sink = self.vertices[1]
@@ -496,9 +498,14 @@ def allocate(preferences, licenses):
     Allocates persons to cars based on their preferences and available licenses.
 
     Approach description (if main function):
-    I first create the network to represent this problem. Then I use calculateMaxFlow to give flow to the edges and
-    return the max flow. Then using getResults if the person vertex is connected to either d or c vertices I put them
-    into the corresponding lists.
+    I first create the network to represent this problem. I create a source and sink. Then I connected the source with
+    all the person vertices by edge with capacity 1. Then I create driver vertices that I connect to sink by edge with
+    capacity 2. I connect the person vertices to their corresponding driver vertices by edge with capacity 1. Then I
+    create car vertices. Then I connect person vertices to their corresponding car vertices by edges with capacity 1.
+    Then I create an intermediary vertex called e. I connect the car vertices to e by edge with capacity 3. I connect
+    the vertex e to sink by edge with capacity of the total amount of persons minus the required amount of drivers.
+    Then I  use calculateMaxFlow to give flow to the edges and return the max flow. Then using getResults if the person
+    vertex is connected to either d or c vertices I put them into the corresponding lists.
 
     :Input:
     preferences: List of lists, where each inner list indicates preferences of a person.
@@ -515,12 +522,12 @@ def allocate(preferences, licenses):
     :Aux space complexity: O(n). Space primarily grows with the number of preferences.
     """
     if len(preferences)<2 or len(licenses) < math.ceil(len(preferences)/5):
-        # each car need minimum 2 persons or there are not enough drivers for the amount of people
+        # Each car need minimum 2 persons or there are not enough drivers for the amount of people
         return None
     network = FlowNetwork()
     network.create_network(preferences, licenses)
     max_flow=network.calculateMaxFlow()
-    if max_flow < len(preferences): #this means not every person can be matched with a car that has 2 drivers
+    if max_flow < len(preferences): # Not every person can be matched with a car that has 2 drivers
         return None
     return network.getResults()
 
