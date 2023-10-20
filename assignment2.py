@@ -1,6 +1,8 @@
 import math
 from queue import Queue
+from typing import List, Tuple, Optional, Union
 
+### DO NOT CHANGE THIS FUNCTION
 def load_dictionary(filename):
     infile = open(filename)
     word, frequency = "", 0
@@ -8,22 +10,22 @@ def load_dictionary(filename):
     for line in infile:
         line.strip()
         if line[0:4] == "word":
-            line = line.replace("word: ", "")
+            line = line.replace("word: ","")
             line = line.strip()
             word = line
         elif line[0:4] == "freq":
-            line = line.replace("frequency: ", "")
+            line = line.replace("frequency: ","")
             frequency = int(line)
         elif line[0:4] == "defi":
             index = len(aList)
-            line = line.replace("definition: ", "")
-            definition = line.replace("\n", "")
-            aList.append([word, definition, frequency])
+            line = line.replace("definition: ","")
+            definition = line.replace("\n","")
+            aList.append([word,definition,frequency])
 
     return aList
 
 class Node:
-    def __init__(self, data=(None, None, None), size=27):
+    def __init__(self, data: Tuple[Optional[str], Optional[str], Optional[int]] = (None, None, None), size: int = 27):
         """
         Function description:
         Initializes a Node object to be used in Trie class.
@@ -50,7 +52,7 @@ class Trie:
         Initializes a Trie with data from the given dictionary.
 
         :Input:
-        Dictionary: A list of lists, where each for each inner index 0 is the word, index 1 is the definition, and
+        Dictionary: A list of lists. Each inner index 0 is the word, index 1 is the definition, and
         index 2 is the frequency of that word.
         :Output, return or postcondition: Initializes a Trie with a root node and populates it with data from the
         Dictionary.
@@ -66,7 +68,7 @@ class Trie:
         for words in Dictionary:
             self.insert(words[0], words)
 
-    def insert(self, key, data):
+    def insert(self, key: str, data: Tuple[str, str, int]) -> None:
         """
         Function description:
         Inserts a word and its data into the Trie.
@@ -84,13 +86,13 @@ class Trie:
         :Aux space complexity: O(M). M is the aux space complexity of insert_aux function.
         """
         current = self.root
-        # Increment the node frequency at the root node
+        # Adds the node frequency at the root node
         current.node_frequency += 1
         # Compare and store data at the current node
         self.compare(current, data)
         self.insert_aux(current, key, 0, data)
 
-    def insert_aux(self, current, key, counter, data=None):
+    def insert_aux(self, current: Node, key: str, counter: int, data: Tuple[str, str, int] = None) -> None:
         """
         Function description:
         Auxiliary function for inserting a word and its data into the Trie.
@@ -98,11 +100,11 @@ class Trie:
         Approach description (if main function):
         The insert_aux method recursively adds a word and its data to Trie object. For each character in the word,
         it calculates the index for the corresponding child node based on the character's position in the alphabet.
-        If a child node at the calculated index exists, it goes to that node. Else, it creates a new node at that index.
-        The method adds the node_frequency at each node along the path, making sure it is the same the number of words
-        sharing that key. It then calls the compare method to update the word information at each node with the
-        highest frequency and alphabetically smaller word. When the end of the word is reached, the word and data are
-        stored in the 0th child node.
+        If a child node at the calculated index exists, it goes to that node. Else, it creates a new node at that
+        index. The method adds the node_frequency at each node along the path, making sure it is the same the number
+        of words sharing that key. It then calls the compare method to update the word information at each node with
+        the highest frequency and alphabetically smaller word. When the end of the word is reached, the word and data
+        are stored in the 0th child node.
 
         :Input:
         current: The current node in the Trie.
@@ -139,7 +141,7 @@ class Trie:
             # Recursively inserts the word
             self.insert_aux(current, key, counter + 1, data)
 
-    def compare(self, current, data, counter=0):
+    def compare(self, current: Node, data: Tuple[str, str, int], counter: int = 0) -> None:
         """
         Function description:
         Compares the frequency of a newly inserted word with the frequency of the word already stored at a node and
@@ -173,7 +175,7 @@ class Trie:
             # Set the current node's data to the data if data or current.frequency is None
             current.word, current.definition, current.frequency = data
 
-    def prefix_search(self, prefix):
+    def prefix_search(self, prefix: str) -> List[Union[str, int]]:
         """
         Function description:
         Returns the word with the highest frequency that has the given prefix, its definition, and the number of words
@@ -193,7 +195,7 @@ class Trie:
         current = self.root
         return self.prefix_search_aux(current, prefix, 0)
 
-    def prefix_search_aux(self, current, prefix, counter):
+    def prefix_search_aux(self, current: Node, prefix: str, counter: int) -> List[Union[str, int]]:
         """
         Function description:
         Auxiliary function for prefix_search.
@@ -224,15 +226,14 @@ class Trie:
             # Move to the next character's node if it exists
             if current.link[index] is not None:
                 current = current.link[index]
+                return self.prefix_search_aux(current, prefix, counter + 1)  # Continue the recursive search
             # Return [None, None, 0] if there is no matching node for the next character
             else:
                 return [None, None, 0]
-            # Continue the search recursively
-            return self.prefix_search_aux(current, prefix, counter + 1)
 
 
 class Vertex:
-    def __init__(self, name):
+    def __init__(self, name: str) -> None:
         """
         Function description:
         Initializes a Vertex object to be used in FlowNetwork class.
@@ -248,7 +249,7 @@ class Vertex:
         self.visited = False
 
 class Edge:
-    def __init__(self, origin, destination, capacity):
+    def __init__(self, origin: str, destination: str, capacity: int) -> None:
         """
         Function description:
         Initializes an Edge object to be used in FlowNetwork class.
@@ -283,14 +284,14 @@ class FlowNetwork:
         """
         self.vertices = []
 
-    def getVertex(self, name):
+    def getVertex(self, name: str) -> Optional[Vertex]:
         """
         Function description:
         Gets the vertex based on its name.
 
         :Input:
         name: Name of the vertex we want to search. A string.
-        :Output, return or postcondition: Returns the vertex we are looking for.
+        :Output, return or postcondition: Returns the vertex we are looking for. A vertex object.
         :Time complexity: O(n). n being the length of self.vertices which is the same as the amount of persons.
         :Aux space complexity: O(1). It's in place.
         """
@@ -298,7 +299,7 @@ class FlowNetwork:
             if name == vertex.name:
                 return vertex
 
-    def addVertex(self, name):
+    def addVertex(self, name: str) -> None:
         """
         Function description:
         Adds a new vertex to self.vertices.
@@ -312,7 +313,7 @@ class FlowNetwork:
         newVertex = Vertex(name)
         self.vertices.append(newVertex)
 
-    def addEdge(self, origin, destination, capacity):
+    def addEdge(self, origin: str, destination: str, capacity: int) -> None:
         """
         Function description:
         Adds a new edge to the origin vertex and the corresponding reverse edge to the destination vertex.
@@ -337,16 +338,15 @@ class FlowNetwork:
         destinationVertex = self.getVertex(destination)
         destinationVertex.edges.append(reverseEdge)
 
-    def getPath(self, origin, destination, path):
+    def getPath(self, origin: str, destination: str) -> Optional[List[Tuple[Edge, int]]]:
         """
         Function description:
-        Determines an augmenting path in the network using BFS. It searches for a path from the origin to the destination
-        that has available capacity.
+        Determines an augmenting path in the network using BFS. It searches for a path from the origin to the
+        destination that has available capacity.
 
         :Input:
         origin: The name of the origin vertex. A string
         destination: The name of the destination vertex. A string.
-        path: The current path. A list of edges being explored.
 
         :Output, return or postcondition:
         Returns an augmenting path from the source to the sink if one exists, else None. The path is represented as a
@@ -383,7 +383,7 @@ class FlowNetwork:
                         queue.put((edge.destination, new_path))  # Enqueue operation
         return None
 
-    def calculateMaxFlow(self):
+    def calculateMaxFlow(self) -> int:
         """
         Function description:
         Calculates the maximum flow in the network and fills the edges with flow usingFord-Fulkerson with BFS.
@@ -391,7 +391,7 @@ class FlowNetwork:
         :Input: None
 
         :Output, return or postcondition:
-        Returns the maximum flow value in the network.
+        Returns the maximum flow value in the network. An integer.
 
         :Time complexity:
         O(F×(V+E)). F is the maximum flow value, V is the number of vertices, and E is the number of edges. Since
@@ -403,17 +403,17 @@ class FlowNetwork:
         """
         source = self.vertices[0]
         sink = self.vertices[1]
-        path = self.getPath(source.name, sink.name, [])
+        path = self.getPath(source.name, sink.name)
         while path != None:
             flow = min(edge[1] for edge in path)
             for edge, res in path:
                 edge.flow += flow
                 edge.reverseEdge.flow -= flow
-            path = self.getPath(source.name, sink.name, [])
+            path = self.getPath(source.name, sink.name)
         sourceEdges = self.vertices[0].edges
         return sum(edge.flow for edge in sourceEdges)
 
-    def create_network(self, preferences, licenses):
+    def create_network(self, preferences: List[List[int]], licenses: List[int]) -> None:
         """
         Function description:
         Constructs a bipartite flow network based on provided preferences and licenses.
@@ -467,7 +467,7 @@ class FlowNetwork:
         # Connect e to sink and the edge's capacity is constraint for the amount of passengers
         self.addEdge("e", "sink", len(preferences) - 2 * math.ceil(len(preferences) / 5))
 
-    def getResults(self):
+    def getResults(self) -> List[List[int]]:
         """
         Function description:
         Uses the flow network to determine the allocation of persons to cars.
@@ -498,7 +498,7 @@ class FlowNetwork:
                 results.append(combined_list)
         return results
 
-def allocate(preferences, licenses):
+def allocate(preferences: List[List[int]], licenses: List[int]) -> Optional[List[List[int]]]:
     """
     Function description:
     Allocates persons to cars based on their preferences and available licenses using a flow network and the
