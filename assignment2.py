@@ -246,9 +246,6 @@ class Vertex:
         self.name = name
         self.edges = [] #stores a list of all outgoing edges
 
-    def __str__(self):
-        return f"Vertex {self.name}"
-
 class Edge:
     def __init__(self, origin, destination, capacity):
         """
@@ -270,9 +267,6 @@ class Edge:
         self.flow = 0
         self.reverseEdge = None
 
-    def __str__(self):
-        return f"Edge ({self.origin} -> {self.destination}) | Flow: {self.flow} | Capacity: {self.capacity}"
-
 class FlowNetwork:
     def __init__(self):
         """
@@ -288,11 +282,6 @@ class FlowNetwork:
         """
         self.vertices = []
 
-    def __str__(self):
-        vertices_str = "\n".join(str(vertex) for vertex in self.vertices)
-        edges_str = "\n".join(str(edge) for edge in self.getEdges())
-        return f"Flow Network:\n\nVertices:\n{vertices_str}\n\nEdges:\n{edges_str}"
-
     def getVertex(self, name):
         """
         Function description:
@@ -307,13 +296,6 @@ class FlowNetwork:
         for vertex in self.vertices:
             if name == vertex.name:
                 return vertex
-
-    def getEdges(self):
-        allEdges = []
-        for vertex in self.vertices:
-            for edge in vertex.edges:
-                allEdges.append(edge)
-        return allEdges
 
     def addVertex(self, name):
         """
