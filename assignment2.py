@@ -1,6 +1,6 @@
 import math
+from queue import Queue
 
-### DO NOT CHANGE THIS FUNCTION
 def load_dictionary(filename):
     infile = open(filename)
     word, frequency = "", 0
@@ -238,13 +238,14 @@ class Vertex:
         Initializes a Vertex object to be used in FlowNetwork class.
 
         :Input:
-        name: Name of the vertex.
-        :Output, return or postcondition: Creates a vertex object with the attributes being name and edges.
+        name: Name of the vertex. A string.
+        :Output, return or postcondition: Creates a vertex object with the attributes being name, edges, and visited.
         :Time complexity: O(1). Just initializing an object.
         :Aux space complexity: O(1). Just initializing a name and an empty list of edges.
         """
         self.name = name
         self.edges = [] #stores a list of all outgoing edges
+        self.visited = False
 
 class Edge:
     def __init__(self, origin, destination, capacity):
@@ -253,9 +254,9 @@ class Edge:
         Initializes an Edge object to be used in FlowNetwork class.
 
         :Input:
-        origin: The origin vertex.
-        destination: The destination vertex.
-        capacity: The capacity.
+        origin: The name of origin vertex. A string.
+        destination: The name of destination vertex. A string.
+        capacity: The capacity. An integer.
         :Output, return or postcondition: Creates a vertex object with the attributes being origin, destination,
         capacity, flow, and reverseEdge.
         :Time complexity: O(1). Just initializing an object.
@@ -288,7 +289,7 @@ class FlowNetwork:
         Gets the vertex based on its name.
 
         :Input:
-        name: Name of the vertex we want to search.
+        name: Name of the vertex we want to search. A string.
         :Output, return or postcondition: Returns the vertex we are looking for.
         :Time complexity: O(n). n being the length of self.vertices which is the same as the amount of persons.
         :Aux space complexity: O(1). It's in place.
@@ -303,7 +304,7 @@ class FlowNetwork:
         Adds a new vertex to self.vertices.
 
         :Input:
-        name: Name which is the name of the vertex we want to add.
+        name: Name which is the name of the vertex we want to add. A string.
         :Output, return or postcondition: Adds a vertex to self.vertices.
         :Time complexity: O(1). We are creating and adding just 1 object at the end of the list.
         :Aux space complexity: O(1). Only creating 1 object.
@@ -317,9 +318,9 @@ class FlowNetwork:
         Adds a new edge to the origin vertex and the corresponding reverse edge to the destination vertex.
 
         :Input:
-        origin: The vertex the edge originates from.
-        destination: The edge destination vertex.
-        capacity: The capacity of the edge.
+        origin: The name of the vertex the edge originates from. A string.
+        destination: The name of the edge destination vertex. A string.
+        capacity: The capacity of the edge. An integer.
         :Output, return or postcondition: Adds an edge to the origin vertex.
         :Time complexity: O(1). We are creating and appending the edge to the originVertex.edges then we create the
         corresponding reverse edge and append them to destinationVertex.edges.
@@ -339,43 +340,66 @@ class FlowNetwork:
     def getPath(self, origin, destination, path):
         """
         Function description:
-        Recursively determines an augmenting path in the network using DFS.
+        Determines an augmenting path in the network using BFS. It searches for a path from the origin to the destination
+        that has available capacity.
 
         :Input:
-        origin: The origin vertex name.
-        destination: The destination vertex name.
-        path: The current path (list of edges) being explored.
+        origin: The name of the origin vertex. A string
+        destination: The name of the destination vertex. A string.
+        path: The current path. A list of edges being explored.
 
         :Output, return or postcondition:
-        Returns an augmenting path from the source to the sink if one exists, else None.
+        Returns an augmenting path from the source to the sink if one exists, else None. The path is represented as a
+        list of tuples where each tuple contains an edge and its residual capacity.
 
-        :Time complexity: O(V + E). V being number of vertices. E being number of edges. In worst case, it would visit
+        :Time complexity:
+        O(V + E). V is the number of vertices and E is the number of edges. In the worst case, BFS would visit
         all the vertices and edges of the flow network.
-        :Aux space complexity: O(V). We might need to traverse through all vertices. It primarily comes from the
-        recursion stack.
+
+        :Aux space complexity:
+        O(V). Due to the BFS queue and the potential need to store paths for all vertices.
         """
-        if origin == destination:
-            return path
-        originVertex = self.getVertex(origin)
-        for edge in originVertex.edges:
-            residualCapacity = edge.capacity - edge.flow
-            if residualCapacity > 0 and not (edge, residualCapacity) in path:
-                result = self.getPath(edge.destination, destination, path + [(edge, residualCapacity)])
-                if result != None:
-                    return result
+        for vertex in self.vertices:
+            vertex.visited = False
+
+        # Using built-in Queue for BFS
+        queue = Queue()
+        queue.put((origin, []))
+        while not queue.empty():
+            (current_vertex_name, path) = queue.get()
+            current_vertex = self.getVertex(current_vertex_name)
+
+            if current_vertex_name == destination:
+                return path
+
+            if not current_vertex.visited:
+                current_vertex.visited = True
+
+                for edge in current_vertex.edges:
+                    residual_capacity = edge.capacity - edge.flow
+                    if residual_capacity > 0 and not (edge, residual_capacity) in path:
+                        new_path = list(path)
+                        new_path.append((edge, residual_capacity))
+                        queue.put((edge.destination, new_path))  # Enqueue operation
+        return None
 
     def calculateMaxFlow(self):
         """
         Function description:
-        Calculates the maximum flow in the network and fill the edges with flow using Ford-Fulkerson method with DFS.
+        Calculates the maximum flow in the network and fills the edges with flow usingFord-Fulkerson with BFS.
 
         :Input: None
+
         :Output, return or postcondition:
         Returns the maximum flow value in the network.
 
-        :Time complexity: O(F×(V+E)). F being the max flow, V being number of vertices, and E being number of edges.
-        Because it uses Ford-Fulkerson with DFS.
-        :Aux space complexity: O(V). Mainly governed by getPath and storage needed to store the path.
+        :Time complexity:
+        O(F×(V+E)). F is the maximum flow value, V is the number of vertices, and E is the number of edges. Since
+        the Ford-Fulkerson method runs as long as augmenting paths can be found and BFS in getPath is used to find
+        paths, the complexity is derived from Ford-Fulkerson's iterations multiplied by the BFS time complexity.
+
+        :Aux space complexity:
+        O(V). Mainly governed by the BFS in getPath and storage needed to store the path.
         """
         source = self.vertices[0]
         sink = self.vertices[1]
@@ -395,7 +419,7 @@ class FlowNetwork:
         Constructs a bipartite flow network based on provided preferences and licenses.
 
         :Input:
-        preferences: List of lists, where each inner list indicates preferences of a person.
+        preferences: List of lists. Each inner list indicates preferences of a person.
         licenses: List of indices indicating which persons have licenses.
 
         :Output, return or postcondition:
@@ -477,31 +501,25 @@ class FlowNetwork:
 def allocate(preferences, licenses):
     """
     Function description:
-    Allocates persons to cars based on their preferences and available licenses.
-
-    Approach description (if main function):
-    I first create the network to represent this problem. I create a source and sink. Then I connected the source with
-    all the person vertices by edge with capacity 1. Then I create driver vertices that I connect to sink by edge with
-    capacity 2. I connect the person vertices to their corresponding driver vertices by edge with capacity 1. Then I
-    create car vertices. Then I connect person vertices to their corresponding car vertices by edges with capacity 1.
-    Then I create an intermediary vertex called e. I connect the car vertices to e by edge with capacity 3. I connect
-    the vertex e to sink by edge with capacity of the total amount of persons minus the required amount of drivers.
-    Then I  use calculateMaxFlow to give flow to the edges and return the max flow. Then using getResults if the person
-    vertex is connected to either d or c vertices I put them into the corresponding lists.
+    Allocates persons to cars based on their preferences and available licenses using a flow network and the
+    Ford-Fulkerson method.
 
     :Input:
-    preferences: List of lists, where each inner list indicates preferences of a person.
-    licenses: List of indices indicating which persons have licenses.
+    preferences (list): List of lists. Each inner list indicates preferences of a person.
+    licenses (list): List of indices indicating which persons have licenses.
 
     :Output, return or postcondition:
-    Returns a list of lists where each inner list represents a car's allocation of people.
-    If allocation is not possible, it returns None.
+    Returns a list of lists where each inner list represents a car's allocation of people. If allocation is not
+    possible, it returns None.
 
-    :Time complexity: O(n^3). n is the length of preferences. Mainly governed by calculateMaxFlow. Since time
-    complexity of calculateMaxFlow is O(F×(V+E)) becomes O(n*(n+n^2)). The max flow is the amount of person, v
-    represents the number of vertices which in this case scales with number of persons and n^2 because the worst case
-    will happen when everybody wants to go to every destination and everybody have license.
-    :Aux space complexity: O(n). Space primarily grows with the number of preferences.
+    :Time complexity:
+    O(n^3), where n is the length of preferences. The complexity is mainly governed by the calculateMaxFlow method.
+    The Ford-Fulkerson method with BFS in getPath can lead to O(n*(n+n^2)) complexity. The max flow is the number of
+    persons, V represents the number of vertices which scales with the number of persons, and n^2 is due to the worst
+    case scenario where everybody wants to go to every destination and everybody has a license.
+
+    :Aux space complexity:
+    O(n), primarily determined by the space requirements of the flow network and the BFS traversal in `getPath`.
     """
     if len(preferences)<2 or len(licenses) < math.ceil(len(preferences)/5):
         # Each car need minimum 2 persons or there are not enough drivers for the amount of people
