@@ -369,8 +369,8 @@ class FlowNetwork:
 
         :Time complexity: O(V + E). V being number of vertices. E being number of edges. In worst case, it would visit
         all the vertices and edges of the flow network.
-        :Aux space complexity: O(V + E). It primarily comes from the recursion stack and the path list that stores the
-        current path.
+        :Aux space complexity: O(V). We might need to traverse through all vertices. It primarily comes from the
+        recursion stack.
         """
         if origin == destination:
             return path
@@ -391,8 +391,8 @@ class FlowNetwork:
         :Output, return or postcondition:
         Returns the maximum flow value in the network.
 
-        :Time complexity: O(VE^2). V being number of vertices. E being number of edges. The Ford-Fulkerson algorithm's
-        worst-case time complexity is O(VE^2) when using DFS to find augmenting paths.
+        :Time complexity: O(F×(V+E)). F being the max flow, V being number of vertices, and E being number of edges.
+        Because it uses Ford-Fulkerson with DFS.
         :Aux space complexity: O(V). Mainly governed by getPath and storage needed to store the path.
         """
         source = self.vertices[0]
@@ -516,9 +516,9 @@ def allocate(preferences, licenses):
     If allocation is not possible, it returns None.
 
     :Time complexity: O(n^3). n is the length of preferences. Mainly governed by calculateMaxFlow. Since time
-    complexity of calculateMaxFlow is O(VE^2) becomes O(n*n^2) because v represents the number of vertices which in
-    this case scales with number of persons and n^2 because the worst case will happen when everybody wants to go to
-    every destination and everybody have license.
+    complexity of calculateMaxFlow is O(F×(V+E)) becomes O(n*(n+n^2)). The max flow is the amount of person, v
+    represents the number of vertices which in this case scales with number of persons and n^2 because the worst case
+    will happen when everybody wants to go to every destination and everybody have license.
     :Aux space complexity: O(n). Space primarily grows with the number of preferences.
     """
     if len(preferences)<2 or len(licenses) < math.ceil(len(preferences)/5):
